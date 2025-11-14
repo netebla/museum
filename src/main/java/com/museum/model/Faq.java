@@ -15,7 +15,7 @@ public class Faq {
     @Size(max = 255)
     private String question;
 
-    @Lob
+    @Column(columnDefinition = "text")
     private String answer;
 
     @Size(max = 100)
@@ -30,4 +30,3 @@ public class Faq {
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
 }
-

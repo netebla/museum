@@ -16,7 +16,7 @@ public class Event {
     @Size(max = 150)
     private String title;
 
-    @Lob
+    @Column(columnDefinition = "text")
     private String description;
 
     @Column(name = "start_date", nullable = false)
@@ -62,4 +62,3 @@ public class Event {
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }
-

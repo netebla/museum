@@ -15,7 +15,7 @@ public class Exhibition {
     @Size(max = 150)
     private String title;
 
-    @Lob
+    @Column(columnDefinition = "text")
     private String description;
 
     @Size(max = 100)
@@ -41,4 +41,3 @@ public class Exhibition {
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }
-
