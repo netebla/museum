@@ -1,0 +1,27 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: museum
+      POSTGRES_USER: museum
+      POSTGRES_PASSWORD: museum
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/museum
+      DB_USERNAME: museum
+      DB_PASSWORD: museum
+    depends_on:
+      - db
+
+volumes:
+  db_data:
+
