@@ -52,9 +52,12 @@ jobs:
             IMAGE_NAME="${{ env.IMAGE_NAME }}"
             docker login ghcr.io -u ${{ github.repository_owner }} -p ${{ secrets.GITHUB_TOKEN }}
             docker pull "$IMAGE_NAME"
+            docker network create museum-net || true
+            docker network connect museum-net museum-db || true
             docker stop museum || true
             docker rm museum || true
             docker run -d --name museum \
+              --network museum-net \
               -e DB_URL='${{ secrets.PROD_DB_URL }}' \
               -e DB_USERNAME='${{ secrets.PROD_DB_USERNAME }}' \
               -e DB_PASSWORD='${{ secrets.PROD_DB_PASSWORD }}' \
