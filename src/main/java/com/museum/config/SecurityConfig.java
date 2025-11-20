@@ -27,6 +27,13 @@ public class SecurityConfig {
                 .requestMatchers(
                         "/",
                         "/index.html",
+                        "/events.html",
+                        "/event.html",
+                        "/exhibitions.html",
+                        "/exhibition.html",
+                        "/tickets.html",
+                        "/visit.html",
+                        "/about.html",
                         "/static/**",
                         "/css/**",
                         "/js/**",

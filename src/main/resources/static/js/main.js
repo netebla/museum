@@ -49,6 +49,16 @@ window.MuseumFront = (function () {
     const card = document.createElement("article");
     card.className = "event-card";
 
+     if (e.imageUrl) {
+       const imgWrap = document.createElement("div");
+       imgWrap.className = "event-card-image";
+       const img = document.createElement("img");
+       img.src = e.imageUrl;
+       img.alt = e.title || "Мероприятие";
+       imgWrap.appendChild(img);
+       card.appendChild(imgWrap);
+     }
+
     const header = document.createElement("div");
     header.className = "event-card-header";
     const meta = document.createElement("div");
@@ -106,6 +116,16 @@ window.MuseumFront = (function () {
     const col = createCol();
     const card = document.createElement("article");
     card.className = "exhibition-card";
+
+    if (x.imageUrl) {
+      const imgWrap = document.createElement("div");
+      imgWrap.className = "exhibition-card-image";
+      const img = document.createElement("img");
+      img.src = x.imageUrl;
+      img.alt = x.title || "Экспозиция";
+      imgWrap.appendChild(img);
+      card.appendChild(imgWrap);
+    }
 
     const header = document.createElement("div");
     header.className = "event-card-header";
@@ -519,7 +539,22 @@ window.MuseumFront = (function () {
       return;
     }
     try {
-      const e = await fetchJson(`/api/events/${id}`);
+      let e;
+      try {
+        e = await fetchJson(`/api/events/${id}`);
+      } catch (err) {
+        // fallback: пробуем получить из общего списка
+        try {
+          const list = await fetchJson("/api/events");
+          e = list.find(ev => String(ev.id) === String(id));
+        } catch (innerErr) {
+          console.error(innerErr);
+        }
+      }
+      if (!e) {
+        container.innerHTML = '<p class="text-muted">Не удалось загрузить данные мероприятия.</p>';
+        return;
+      }
       const title = e.title || "Мероприятие";
       const dates = formatDateRange(e.startDate, e.endDate);
       const hall = e.hall || "";
@@ -572,7 +607,22 @@ window.MuseumFront = (function () {
       return;
     }
     try {
-      const x = await fetchJson(`/api/exhibitions/${id}`);
+      let x;
+      try {
+        x = await fetchJson(`/api/exhibitions/${id}`);
+      } catch (err) {
+        // fallback: пробуем получить из общего списка
+        try {
+          const list = await fetchJson("/api/exhibitions");
+          x = list.find(ex => String(ex.id) === String(id));
+        } catch (innerErr) {
+          console.error(innerErr);
+        }
+      }
+      if (!x) {
+        container.innerHTML = '<p class="text-muted">Не удалось загрузить данные экспозиции.</p>';
+        return;
+      }
       const title = x.title || "Экспозиция";
       const hall = x.hall || "";
       const status = x.status || "";
