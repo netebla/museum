@@ -40,6 +40,39 @@ body {
   height: 260px;
 }
 
+.hero-carousel {
+  border-radius: 1.8rem;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+  background: #111;
+}
+
+.hero-slide-inner {
+  min-height: 260px;
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  color: #fff;
+}
+
+.hero-slide-meta {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  opacity: 0.8;
+}
+
+.hero-slide-title {
+  font-size: 1.05rem;
+  margin-top: 0.4rem;
+}
+
+.hero-slide-text {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
 .hero-frame {
   position: absolute;
   inset: 0;
@@ -67,6 +100,38 @@ body {
 .section-subtitle {
   color: #6c757d;
   max-width: 32rem;
+}
+
+.section-nav {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.nav-card {
+  display: block;
+  padding: 1.1rem 1.2rem;
+  border-radius: 1rem;
+  border: 1px solid #eaeaea;
+  background: #fff;
+  text-decoration: none;
+  color: inherit;
+  height: 100%;
+}
+
+.nav-card:hover {
+  border-color: #111;
+}
+
+.nav-card-title {
+  display: block;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 0.4rem;
+}
+
+.nav-card-text {
+  font-size: 0.9rem;
+  color: #555;
 }
 
 .event-card,
@@ -152,3 +217,30 @@ body {
   background-color: #f1f3f5;
 }
 
+.news-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.news-item {
+  padding: 1rem 1.1rem;
+  border-radius: 0.9rem;
+  border: 1px solid #eee;
+  background: #fff;
+}
+
+.footer-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 0.5rem;
+}
+
+.ticket-flow .ticket-step {
+  border-bottom: 1px solid #f1f3f5;
+  padding-bottom: 0.75rem;
+}
+
+.ticket-flow .ticket-step:last-child {
+  border-bottom: none;
+}

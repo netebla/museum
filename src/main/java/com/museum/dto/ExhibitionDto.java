@@ -14,5 +14,19 @@ public class ExhibitionDto {
     public ExhibitionStatus status;
     @Size(max = 255)
     public String imageUrl;
-}
 
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getHall() { return hall; }
+    public void setHall(String hall) { this.hall = hall; }
+
+    public ExhibitionStatus getStatus() { return status; }
+    public void setStatus(ExhibitionStatus status) { this.status = status; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+}

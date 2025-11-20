@@ -17,10 +17,10 @@
       </button>
       <div class="collapse navbar-collapse" id="mainNavbar">
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link" href="#events">Афиша</a></li>
-          <li class="nav-item"><a class="nav-link" href="#exhibitions">Экспозиции</a></li>
-          <li class="nav-item"><a class="nav-link" href="#visit">Посещение</a></li>
-          <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+          <li class="nav-item"><a class="nav-link" href="/events.html">Афиша</a></li>
+          <li class="nav-item"><a class="nav-link" href="/exhibitions.html">Экспозиции</a></li>
+          <li class="nav-item"><a class="nav-link" href="/visit.html">Посетителям</a></li>
+          <li class="nav-item"><a class="nav-link" href="/about.html">О музее</a></li>
           <li class="nav-item ms-lg-3"><a class="btn btn-outline-dark btn-sm" href="/login">Вход</a></li>
         </ul>
       </div>
@@ -37,13 +37,23 @@
             Следите за актуальной афишей, открывайте постоянные и временные экспозиции, планируйте визит и оформляйте билеты онлайн.
           </p>
           <div class="d-flex flex-wrap gap-2">
-            <a href="#events" class="btn btn-dark">Афиша мероприятий</a>
-            <a href="#visit" class="btn btn-outline-dark">Планировать визит</a>
+            <a href="/events.html" class="btn btn-dark">Купить билет</a>
+            <a href="/visit.html" class="btn btn-outline-dark">Планировать визит</a>
           </div>
         </div>
-        <div class="col-lg-5 ms-lg-auto d-none d-lg-block">
-          <div class="hero-image-placeholder">
-            <div class="hero-frame"></div>
+        <div class="col-lg-5 ms-lg-auto">
+          <div id="heroCarousel" class="carousel slide hero-carousel" data-bs-ride="carousel">
+            <div class="carousel-inner" id="hero-slides">
+              <!-- Слайды с событиями подставляются через JS -->
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Предыдущее</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Следующее</span>
+            </button>
           </div>
         </div>
       </div>
@@ -52,6 +62,37 @@
 </header>
 
 <main>
+  <section class="section-padding section-nav bg-white">
+    <div class="container">
+      <div class="row g-3">
+        <div class="col-md-3 col-6">
+          <a href="/events.html" class="nav-card">
+            <span class="nav-card-title">Афиша</span>
+            <span class="nav-card-text">Лекции, показы, экскурсии и спецпроекты.</span>
+          </a>
+        </div>
+        <div class="col-md-3 col-6">
+          <a href="/exhibitions.html" class="nav-card">
+            <span class="nav-card-title">Экспозиции</span>
+            <span class="nav-card-text">Постоянные и временные выставки музея.</span>
+          </a>
+        </div>
+        <div class="col-md-3 col-6">
+          <a href="/visit.html" class="nav-card">
+            <span class="nav-card-title">Посетителям</span>
+            <span class="nav-card-text">Как добраться, часы работы и FAQ.</span>
+          </a>
+        </div>
+        <div class="col-md-3 col-6">
+          <a href="/about.html" class="nav-card">
+            <span class="nav-card-title">О музее</span>
+            <span class="nav-card-text">Миссия, история и команда музея.</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="events" class="section-padding bg-light">
     <div class="container">
       <div class="d-flex justify-content-between align-items-end mb-3">
@@ -145,25 +186,109 @@
     </div>
   </section>
 
-  <section id="faq" class="section-padding">
+  <section id="about" class="section-padding">
     <div class="container">
-      <h2 class="section-title mb-3">Вопросы посетителей</h2>
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <h2 class="section-title">О музее</h2>
+          <p class="section-subtitle mb-3">
+            Этот раздел описывает миссию, коллекцию и архитектуру музея.
+            Тексты здесь — заглушка, адаптируйте под реальный музей.
+          </p>
+          <p>
+            Музей — это открытое культурное пространство, в котором современное искусство,
+            архитектура и городская среда соединяются в единую историю. Постоянная экспозиция
+            и временные выставки знакомят посетителей с ключевыми явлениями искусства XX–XXI веков,
+            а публичная программа расширяет контекст через лекции, кинопоказы и дискуссии.
+          </p>
+          <p class="mb-4">
+            Информационно‑справочная система музея объединяет афишу, экспозиции и сервисы для
+            посетителей, позволяя заранее планировать визит, узнавать о новых проектах и оформлять билеты онлайн.
+          </p>
+          <a href="/about.html" class="btn btn-outline-dark btn-sm">Подробнее о музее</a>
+        </div>
+        <div class="col-lg-5">
+          <div class="about-highlight card border-0 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title mb-3">Кратко</h5>
+              <ul class="list-unstyled small mb-0">
+                <li>• Постоянная экспозиция и временные проекты</li>
+                <li>• Публичная программа: лекции, показы, мастер‑классы</li>
+                <li>• Образовательные программы для взрослых и детей</li>
+                <li>• Онлайн‑инструменты для планирования визита</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="news" class="section-padding">
+    <div class="container">
+      <h2 class="section-title mb-3">Новости и анонсы</h2>
       <p class="section-subtitle mb-4">
-        Раздел заполняется через административную панель. Вопросы и ответы подгружаются с REST API.
+        Здесь будут появляться новости музея и пресс‑релизы. Сейчас используются примерные записи.
       </p>
-      <div class="accordion" id="faq-accordion"></div>
+      <div class="news-list">
+        <article class="news-item">
+          <div class="news-meta small text-muted mb-1">01.02.2025</div>
+          <h3 class="news-title h6 mb-1">Открытие новой временной экспозиции</h3>
+          <p class="news-text small mb-0">Музей запускает выставочный проект, посвящённый архитектуре модернизма и наследию индустриальных районов города.</p>
+        </article>
+        <article class="news-item">
+          <div class="news-meta small text-muted mb-1">15.01.2025</div>
+          <h3 class="news-title h6 mb-1">Публичная программа на февраль</h3>
+          <p class="news-text small mb-0">Лекции, кинопоказы и экскурсии, сопровождающие текущие выставочные проекты.</p>
+        </article>
+        <article class="news-item">
+          <div class="news-meta small text-muted mb-1">20.12.2024</div>
+          <h3 class="news-title h6 mb-1">Изменение расписания в праздничные дни</h3>
+          <p class="news-text small mb-0">Обновлённые часы работы и специальные мероприятия в новогодний период.</p>
+        </article>
+      </div>
     </div>
   </section>
 </main>
 
 <footer class="museum-footer border-top">
-  <div class="container d-flex flex-wrap justify-content-between align-items-center py-3">
-    <p class="mb-0 small text-muted">
-      Музей · Демо-информационная система на Spring Boot
-    </p>
-    <div class="d-flex gap-2">
-      <a href="/swagger-ui.html" class="small link-secondary">API (Swagger)</a>
-      <a href="/admin" class="small link-secondary">Админ‑панель</a>
+  <div class="container py-4">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <h6 class="footer-title">Музей</h6>
+        <p class="small mb-2">Демо‑информационная система на Spring Boot.</p>
+        <p class="small mb-0 text-muted">
+          Используйте админ‑панель для наполнения афиши, экспозиций и FAQ.
+        </p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-title">Контакты</h6>
+        <p class="small mb-1">Город, улица, дом</p>
+        <p class="small mb-1">Телефон: +7 (000) 000‑00‑00</p>
+        <p class="small mb-1">Email: info@museum.local</p>
+        <p class="small mb-0">Вт–Вс: 11:00–21:00, Пн — выходной</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-title">Подписка и ссылки</h6>
+        <form class="d-flex gap-2 mb-2">
+          <input type="email" class="form-control form-control-sm" placeholder="Ваш e‑mail (заглушка)">
+          <button class="btn btn-dark btn-sm" type="button">Подписаться</button>
+        </form>
+        <div class="d-flex flex-wrap gap-2 small">
+          <span class="text-muted">Соцсети (пример):</span>
+          <a href="#" class="link-secondary text-decoration-none">VK</a>
+          <a href="#" class="link-secondary text-decoration-none">Telegram</a>
+          <a href="#" class="link-secondary text-decoration-none">YouTube</a>
+        </div>
+        <div class="small mt-2">
+          <a href="/swagger-ui.html" class="link-secondary text-decoration-none">API (Swagger)</a> ·
+          <a href="/admin" class="link-secondary text-decoration-none">Админ‑панель</a>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center pt-3 mt-3 border-top small text-muted">
+      <span>© Музей, 2025</span>
+      <span>Учебный проект</span>
     </div>
   </div>
 </footer>
@@ -172,11 +297,11 @@
 <script src="/js/main.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    MuseumFront.initHeroCarousel('hero-slides');
     MuseumFront.loadEventsPreview('events-list');
     MuseumFront.loadExhibitionsPreview('exhibitions-list');
     MuseumFront.populateTicketEvents('ticket-event');
     MuseumFront.initTicketForm('ticket-form', 'ticket-event', 'ticket-name', 'ticket-email', 'ticket-message');
-    MuseumFront.loadFaq('faq-accordion');
   });
 </script>
 </body>

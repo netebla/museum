@@ -35,6 +35,25 @@
         </p>
       </div>
     </div>
+    <div class="row g-3 mb-3">
+      <div class="col-md-4">
+        <label class="form-label small text-uppercase text-muted mb-1">Зал</label>
+        <select id="exh-hall-filter" class="form-select form-select-sm">
+          <option value="all">Все залы</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small text-uppercase text-muted mb-1">Тип</label>
+        <select id="exh-status-filter" class="form-select form-select-sm">
+          <option value="all">Все</option>
+          <option value="PERMANENT">Постоянная экспозиция</option>
+          <option value="TEMPORARY">Временная выставка</option>
+        </select>
+      </div>
+      <div class="col-md-4 d-flex align-items-end justify-content-md-end">
+        <button id="exh-reset" class="btn btn-outline-secondary btn-sm" type="button">Сбросить фильтры</button>
+      </div>
+    </div>
     <div id="exhibitions-list-full" class="row g-3"></div>
   </div>
 </main>
@@ -53,9 +72,8 @@
 <script src="/js/main.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    MuseumFront.loadExhibitionsGrid('exhibitions-list-full');
+    MuseumFront.initExhibitionsPage('exhibitions-list-full', 'exh-hall-filter', 'exh-status-filter', 'exh-reset');
   });
 </script>
 </body>
 </html>
-

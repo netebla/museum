@@ -35,6 +35,29 @@
         </p>
       </div>
     </div>
+    <div class="row g-3 mb-3">
+      <div class="col-md-4">
+        <label class="form-label small text-uppercase text-muted mb-1">Дата</label>
+        <select id="events-date-filter" class="form-select form-select-sm">
+          <option value="all">Все даты</option>
+          <option value="upcoming">Только будущие</option>
+          <option value="past">Архив</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small text-uppercase text-muted mb-1">Тип события (заглушка)</label>
+        <select id="events-type-filter" class="form-select form-select-sm">
+          <option value="all">Все типы</option>
+          <option value="lecture">Лекции</option>
+          <option value="screening">Показы</option>
+          <option value="tour">Экскурсии</option>
+        </select>
+      </div>
+      <div class="col-md-4 d-flex align-items-end justify-content-md-end">
+        <button id="events-reset" class="btn btn-outline-secondary btn-sm me-2" type="button">Сбросить фильтры</button>
+        <a href="#events-list-full" class="btn btn-link btn-sm">Перейти к списку</a>
+      </div>
+    </div>
     <div id="events-list-full" class="row g-3"></div>
   </div>
 </main>
@@ -53,9 +76,8 @@
 <script src="/js/main.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    MuseumFront.loadEventsGrid('events-list-full');
+    MuseumFront.initEventsPage('events-list-full', 'events-date-filter', 'events-type-filter', 'events-reset');
   });
 </script>
 </body>
 </html>
-

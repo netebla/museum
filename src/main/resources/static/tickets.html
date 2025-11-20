@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Покупка билета — Музей</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/css/main.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+  <div class="container">
+    <a class="navbar-brand fw-semibold" href="/">Музей</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#ticketsNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="ticketsNavbar">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="/">Главная</a></li>
+        <li class="nav-item"><a class="nav-link" href="/events.html">Афиша</a></li>
+        <li class="nav-item"><a class="nav-link" href="/exhibitions.html">Экспозиции</a></li>
+        <li class="nav-item ms-lg-3"><a class="btn btn-outline-dark btn-sm" href="/login">Вход</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="section-padding">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <h1 class="section-title mb-2">Покупка билета</h1>
+        <p class="section-subtitle mb-4">
+          Шаги: выберите мероприятие, укажите данные и подтвердите заявку.
+          На этом этапе используется учебная интеграция с API.
+        </p>
+
+        <form id="ticket-flow-form" class="ticket-flow">
+          <section class="ticket-step mb-4">
+            <h2 class="h6 text-uppercase text-muted mb-2">Шаг 1. Выбор мероприятия</h2>
+            <div class="mb-3">
+              <label class="form-label">Мероприятие</label>
+              <select id="ticket-flow-event" class="form-select" required></select>
+              <div class="form-text">
+                Список подгружается из <code>/api/events</code>. При переходе со страницы события событие может быть выбрано автоматически.
+              </div>
+            </div>
+          </section>
+
+          <section class="ticket-step mb-4">
+            <h2 class="h6 text-uppercase text-muted mb-2">Шаг 2. Количество билетов</h2>
+            <div class="row g-3 align-items-end">
+              <div class="col-6 col-md-4">
+                <label class="form-label">Билетов, шт.</label>
+                <input type="number" id="ticket-flow-qty" class="form-control" min="1" value="1" required>
+              </div>
+              <div class="col-6 col-md-4">
+                <label class="form-label">Ориентировочная цена</label>
+                <input type="text" id="ticket-flow-total" class="form-control" readonly placeholder="Рассчитывается по цене события">
+              </div>
+            </div>
+            <p class="small text-muted mt-2 mb-0">
+              На стороне бэкенда сейчас покупка оформляется как один билет за запрос.
+              Поле количества используется только для расчёта суммы и сценария, без реальной мультипокупки.
+            </p>
+          </section>
+
+          <section class="ticket-step mb-4">
+            <h2 class="h6 text-uppercase text-muted mb-2">Шаг 3. Данные посетителя</h2>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Имя и фамилия</label>
+                <input id="ticket-flow-name" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">E‑mail</label>
+                <input id="ticket-flow-email" type="email" class="form-control" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Комментарий (необязательно)</label>
+                <textarea id="ticket-flow-note" class="form-control" rows="2" placeholder="Например, количество гостей, особенности посещения и т.д. (для дизайна)"></textarea>
+              </div>
+            </div>
+          </section>
+
+          <section class="ticket-step mb-4">
+            <h2 class="h6 text-uppercase text-muted mb-2">Шаг 4. Подтверждение</h2>
+            <p class="small mb-2">
+              После нажатия на кнопку будет отправлен запрос к API
+              <code>POST /api/events/{eventId}/tickets/purchase</code> с вашим именем и e‑mail.
+            </p>
+            <button type="submit" class="btn btn-dark">Подтвердить покупку</button>
+            <div id="ticket-flow-message" class="small mt-2"></div>
+          </section>
+        </form>
+      </div>
+      <div class="col-lg-5">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <h2 class="h6 text-uppercase text-muted mb-2">Сводка заказа</h2>
+            <p class="mb-1"><strong id="ticket-summary-title">Мероприятие не выбрано</strong></p>
+            <p class="small mb-1 text-muted" id="ticket-summary-date"></p>
+            <p class="small mb-3 text-muted" id="ticket-summary-hall"></p>
+            <p class="small mb-1">Количество билетов: <span id="ticket-summary-qty">1</span></p>
+            <p class="small mb-3">Итого: <span id="ticket-summary-total">—</span></p>
+            <p class="small text-muted mb-0">
+              Здесь отображается примерная стоимость, рассчитанная на основе цены билета в карточке события.
+              Для реальной онлайн‑оплаты потребуется интеграция с платёжным провайдером.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="museum-footer border-top">
+  <div class="container d-flex flex-wrap justify-content-between align-items-center py-3">
+    <p class="mb-0 small text-muted">Музей · Покупка билета</p>
+    <div class="d-flex gap-2">
+      <a href="/swagger-ui.html" class="small link-secondary">API (Swagger)</a>
+      <a href="/admin" class="small link-secondary">Админ‑панель</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/main.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    MuseumFront.initTicketsPage({
+      eventSelectId: 'ticket-flow-event',
+      qtyInputId: 'ticket-flow-qty',
+      totalInputId: 'ticket-flow-total',
+      nameInputId: 'ticket-flow-name',
+      emailInputId: 'ticket-flow-email',
+      formId: 'ticket-flow-form',
+      messageId: 'ticket-flow-message',
+      summaryTitleId: 'ticket-summary-title',
+      summaryDateId: 'ticket-summary-date',
+      summaryHallId: 'ticket-summary-hall',
+      summaryQtyId: 'ticket-summary-qty',
+      summaryTotalId: 'ticket-summary-total'
+    });
+  });
+</script>
+</body>
+</html>
+
+*** Add File: src/main/resources/static/visit.html
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Посетителям — Музей</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/css/main.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+  <div class="container">
+    <a class="navbar-brand fw-semibold" href="/">Музей</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#visitNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="visitNavbar">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="/">Главная</a></li>
+        <li class="nav-item"><a class="nav-link" href="/events.html">Афиша</a></li>
+        <li class="nav-item"><a class="nav-link" href="/exhibitions.html">Экспозиции</a></li>
+        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/visit.html">Посетителям</a></li>
+        <li class="nav-item ms-lg-3"><a class="btn btn-outline-dark btn-sm" href="/login">Вход</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="section-padding">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <h1 class="section-title mb-2">Посетителям</h1>
+        <p class="section-subtitle mb-4">
+          Информация о часах работы, способах проезда, правилах посещения и ответы на популярные вопросы.
+        </p>
+
+        <section class="mb-4">
+          <h2 class="h6 text-uppercase text-muted mb-2">FAQ — вопросы и ответы</h2>
+          <div class="accordion" id="visit-faq"></div>
+        </section>
+
+        <section class="mb-4">
+          <h2 class="h6 text-uppercase text-muted mb-2">Правила посещения</h2>
+          <ul class="small mb-0">
+            <li>Пожалуйста, не прикасайтесь к экспонатам и объектам экспозиции.</li>
+            <li>Фотосъёмка возможна там, где это разрешено, без вспышки и штатива.</li>
+            <li>В залах просьба говорить тихо и не мешать другим посетителям.</li>
+            <li>Большие сумки и верхнюю одежду можно оставить в гардеробе или камере хранения.</li>
+          </ul>
+        </section>
+      </div>
+
+      <div class="col-lg-5">
+        <section class="mb-4">
+          <h2 class="h6 text-uppercase text-muted mb-2">Как добраться</h2>
+          <p class="small mb-1"><strong>Адрес:</strong> Город, улица, дом (пример).</p>
+          <p class="small mb-1"><strong>Метро:</strong> ближайшая станция, маршрут пешком 10–15 минут.</p>
+          <p class="small mb-1"><strong>Автобус:</strong> остановка «Музей», маршруты 1, 2, 3 (пример).</p>
+          <p class="small mb-0"><strong>Авто:</strong> парковка в окрестностях, ориентируйтесь по навигатору.</p>
+        </section>
+
+        <section class="mb-4">
+          <h2 class="h6 text-uppercase text-muted mb-2">Часы работы</h2>
+          <p class="small mb-1">Вт–Пт: 11:00–20:00</p>
+          <p class="small mb-1">Сб–Вс: 11:00–21:00</p>
+          <p class="small mb-1">Пн: выходной</p>
+          <p class="small mb-0 text-muted">В праздничные дни расписание может меняться — следите за анонсами.</p>
+        </section>
+
+        <section class="mb-4">
+          <h2 class="h6 text-uppercase text-muted mb-2">Контакты</h2>
+          <p class="small mb-1">Телефон: +7 (000) 000‑00‑00</p>
+          <p class="small mb-1">Email: info@museum.local</p>
+          <p class="small mb-0 text-muted">По этим контактам можно уточнить информацию о расписании, доступности и экскурсиях.</p>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="museum-footer border-top">
+  <div class="container d-flex flex-wrap justify-content-between align-items-center py-3">
+    <p class="mb-0 small text-muted">Музей · Информация для посетителей</p>
+    <div class="d-flex gap-2">
+      <a href="/swagger-ui.html" class="small link-secondary">API (Swagger)</a>
+      <a href="/admin" class="small link-secondary">Админ‑панель</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/main.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    MuseumFront.loadFaq('visit-faq');
+  });
+</script>
+</body>
+</html>
+
+*** Add File: src/main/resources/static/about.html
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>О музее — Музей</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/css/main.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+  <div class="container">
+    <a class="navbar-brand fw-semibold" href="/">Музей</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#aboutNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="aboutNavbar">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="/">Главная</a></li>
+        <li class="nav-item"><a class="nav-link" href="/events.html">Афиша</a></li>
+        <li class="nav-item"><a class="nav-link" href="/exhibitions.html">Экспозиции</a></li>
+        <li class="nav-item"><a class="nav-link" href="/visit.html">Посетителям</a></li>
+        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/about.html">О музее</a></li>
+        <li class="nav-item ms-lg-3"><a class="btn btn-outline-dark btn-sm" href="/login">Вход</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="section-padding">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <h1 class="section-title mb-3">О музее</h1>
+        <p class="section-subtitle mb-4">
+          Здесь может быть длинный текст о миссии, истории и архитектуре музея. Сейчас используется примерный контент.
+        </p>
+
+        <p>
+          Музей позиционирует себя как пространство, в котором исследуются взаимосвязи между историей города,
+          архитектурой и современным искусством. Экспозиционные и публичные программы основаны на исследовательских
+          проектах кураторов, художников и архитекторов, которые работают с темой наследия и его переосмысления.
+        </p>
+        <p>
+          Важной частью деятельности музея являются образовательные программы: лекции, семинары, мастер‑классы,
+          встречи с художниками и архитекторами. Они сопровождают выставки и помогают посетителям глубже погружаться
+          в темы проектов.
+        </p>
+        <p>
+          Информационно‑справочная система, которую вы видите, — это учебный проект, демонстрирующий, как можно
+          объединить работу с базой данных, REST API и современный интерфейс публичного сайта музея.
+        </p>
+
+        <h2 class="h5 mt-4 mb-2">Миссия</h2>
+        <p class="mb-3">
+          Миссия музея — создавать пространство для диалога между прошлым и настоящим, между профессиональным
+          сообществом и широкой публикой, между локальным городским контекстом и глобальными культурными процессами.
+        </p>
+
+        <h2 class="h5 mt-4 mb-2">Команда и партнёры</h2>
+        <p class="mb-3">
+          В реальном проекте здесь можно разместить список кураторов, архитекторов, исследователей и партнёров музея.
+          Для демонстрации достаточно заглушечного текста.
+        </p>
+      </div>
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-3">
+          <div class="card-body">
+            <h2 class="h6 text-uppercase text-muted mb-2">Факты</h2>
+            <ul class="small mb-0 list-unstyled">
+              <li>• Постоянная экспозиция (пример)</li>
+              <li>• Несколько временных выставок в год</li>
+              <li>• Публичная программа: лекции, показы, дискуссии</li>
+              <li>• Образовательные программы для разных аудиторий</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <h2 class="h6 text-uppercase text-muted mb-2">Контакты</h2>
+            <p class="small mb-1">Город, улица, дом</p>
+            <p class="small mb-1">Телефон: +7 (000) 000‑00‑00</p>
+            <p class="small mb-0">Email: info@museum.local</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="museum-footer border-top">
+  <div class="container d-flex flex-wrap justify-content-between align-items-center py-3">
+    <p class="mb-0 small text-muted">Музей · О музее</p>
+    <div class="d-flex gap-2">
+      <a href="/swagger-ui.html" class="small link-secondary">API (Swagger)</a>
+      <a href="/admin" class="small link-secondary">Админ‑панель</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
