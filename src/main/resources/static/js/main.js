@@ -443,7 +443,8 @@ window.MuseumFront = (function () {
         const keywords = {
           lecture: ["лекция", "talk"],
           screening: ["сеанс", "film", "показ"],
-          tour: ["экскурсия", "тур"]
+          tour: ["экскурсия", "тур"],
+          exhibition: ["выставка", "экспозиция"]
         }[typeValue] || [];
         list = list.filter(e =>
           keywords.some(k => (e.title || "").toLowerCase().includes(k))

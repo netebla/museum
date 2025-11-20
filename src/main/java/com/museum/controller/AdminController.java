@@ -100,13 +100,15 @@ public class AdminController {
     }
 
     @PostMapping("/exhibitions")
-    public String createExhibition(@Valid @ModelAttribute("form") ExhibitionDto form, BindingResult br, Model model) {
+    public String createOrUpdateExhibition(@Valid @ModelAttribute("form") ExhibitionDto form, BindingResult br, Model model) {
         if (br.hasErrors()) {
             model.addAttribute("exhibitions", exhibitionService.findAll());
             model.addAttribute("statuses", ExhibitionStatus.values());
             return "admin/exhibitions";
         }
-        var ex = new com.museum.model.Exhibition();
+        var ex = form.getId() != null
+                ? exhibitionService.findById(form.getId()).orElseGet(com.museum.model.Exhibition::new)
+                : new com.museum.model.Exhibition();
         ex.setTitle(form.title);
         ex.setDescription(form.description);
         ex.setHall(form.hall);
@@ -120,5 +122,26 @@ public class AdminController {
     public String deleteExhibition(@PathVariable("id") Long id) {
         exhibitionService.deleteById(id);
         return "redirect:/admin/exhibitions";
+    }
+
+    @GetMapping("/exhibitions/{id}/edit")
+    public String editExhibition(@PathVariable("id") Long id, Model model) {
+        var opt = exhibitionService.findById(id);
+        if (opt.isEmpty()) {
+            return "redirect:/admin/exhibitions";
+        }
+        var e = opt.get();
+        var dto = new ExhibitionDto();
+        dto.setId(e.getId());
+        dto.setTitle(e.getTitle());
+        dto.setDescription(e.getDescription());
+        dto.setHall(e.getHall());
+        dto.setStatus(e.getStatus());
+        dto.setImageUrl(e.getImageUrl());
+
+        model.addAttribute("exhibitions", exhibitionService.findAll());
+        model.addAttribute("form", dto);
+        model.addAttribute("statuses", ExhibitionStatus.values());
+        return "admin/exhibitions";
     }
 }

@@ -36,6 +36,7 @@
           <td th:text="${x.hall}"></td>
           <td th:text="${x.status}"></td>
           <td>
+            <a class="btn btn-sm btn-outline-secondary me-1" th:href="@{'/admin/exhibitions/' + ${x.id} + '/edit'}">Редактировать</a>
             <form th:action="@{'/admin/exhibitions/' + ${x.id} + '/delete'}" method="post" class="d-inline">
               <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
               <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить?')">Удалить</button>
@@ -48,8 +49,9 @@
     <div class="col-md-5">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">Добавить экспозицию</h5>
+          <h5 class="card-title">Экспозиция</h5>
           <form method="post" th:action="@{/admin/exhibitions}" th:object="${form}">
+            <input type="hidden" th:field="*{id}">
             <div class="mb-2">
               <label class="form-label">Название</label>
               <input class="form-control" th:field="*{title}" required>
@@ -73,7 +75,7 @@
               <input class="form-control" th:field="*{imageUrl}">
             </div>
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-            <button class="btn btn-primary">Создать</button>
+            <button class="btn btn-primary">Сохранить</button>
           </form>
         </div>
       </div>
@@ -82,4 +84,3 @@
 </div>
 </body>
 </html>
-

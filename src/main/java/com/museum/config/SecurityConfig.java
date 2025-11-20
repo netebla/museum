@@ -66,7 +66,9 @@ public class SecurityConfig {
             // Форма логина (сессии)
             .formLogin(form -> form
                 .loginPage("/login").permitAll()
-                .defaultSuccessUrl("/swagger-ui.html", true)
+                // Если пользователь заходил на защищённую страницу (например, /admin/exhibitions),
+                // после успешного входа его вернёт туда, а не всегда в Swagger.
+                .defaultSuccessUrl("/swagger-ui.html")
             )
             .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/").permitAll());
 
