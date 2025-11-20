@@ -524,19 +524,26 @@ window.MuseumFront = (function () {
       const dates = formatDateRange(e.startDate, e.endDate);
       const hall = e.hall || "";
       const price = e.ticketPrice != null ? `${e.ticketPrice} ₽` : "Вход свободный / по регистрации";
+      const image = e.imageUrl || "";
+
+      const imageBlock = image
+        ? `<div class="mb-3">
+             <img src="${image}" alt="${title}" class="img-fluid rounded-3 w-100" style="object-fit: cover; max-height: 320px;">
+           </div>`
+        : "";
 
       container.innerHTML = `
         <div class="row g-4">
-          <div class="col-lg-8">
+          <div class="col-lg-7">
             <p class="small text-uppercase text-muted mb-1">Мероприятие</p>
             <h1 class="section-title mb-2">${title}</h1>
-            <p class="small mb-2">${dates}</p>
-            <p class="small text-muted mb-2">${hall}</p>
+            <p class="small mb-1">${dates}</p>
+            <p class="small text-muted mb-1">${hall}</p>
             <p class="small mb-3"><strong>${price}</strong></p>
-            <a href="/tickets.html?eventId=${e.id}" class="btn btn-dark mb-3">Купить билет</a>
+            ${imageBlock}
             <p>${(e.description || "").replace(/\n/g, "<br>")}</p>
           </div>
-          <div class="col-lg-4">
+          <div class="col-lg-5">
             <div class="card border-0 shadow-sm mb-3">
               <div class="card-body small">
                 <h2 class="h6 text-uppercase text-muted mb-2">Практическая информация</h2>
@@ -545,7 +552,8 @@ window.MuseumFront = (function () {
                 <p class="mb-0 text-muted">Точные детали формата и расписания можно добавить в описание.</p>
               </div>
             </div>
-            <a href="/events.html" class="small text-decoration-none">← Назад к афише</a>
+            <a href="/tickets.html?eventId=${e.id}" class="btn btn-dark mb-3 w-100">Купить билет</a>
+            <a href="/events.html" class="small text-decoration-none d-block">← Назад к афише</a>
           </div>
         </div>
       `;
@@ -569,18 +577,25 @@ window.MuseumFront = (function () {
       const hall = x.hall || "";
       const status = x.status || "";
       const statusText = status === "PERMANENT" ? "Постоянная экспозиция" : status === "TEMPORARY" ? "Временная выставка" : "";
+      const image = x.imageUrl || "";
+
+      const imageBlock = image
+        ? `<div class="mb-3">
+             <img src="${image}" alt="${title}" class="img-fluid rounded-3 w-100" style="object-fit: cover; max-height: 320px;">
+           </div>`
+        : "";
 
       container.innerHTML = `
         <div class="row g-4">
-          <div class="col-lg-8">
+          <div class="col-lg-7">
             <p class="small text-uppercase text-muted mb-1">Экспозиция</p>
             <h1 class="section-title mb-2">${title}</h1>
-            <p class="small mb-2">${statusText}</p>
-            <p class="small text-muted mb-2">${hall}</p>
-            <a href="/tickets.html" class="btn btn-dark mb-3">Купить билет</a>
+            <p class="small mb-1">${statusText}</p>
+            <p class="small text-muted mb-3">${hall}</p>
+            ${imageBlock}
             <p>${(x.description || "").replace(/\n/g, "<br>")}</p>
           </div>
-          <div class="col-lg-4">
+          <div class="col-lg-5">
             <div class="card border-0 shadow-sm mb-3">
               <div class="card-body small">
                 <h2 class="h6 text-uppercase text-muted mb-2">Факты об экспозиции</h2>
@@ -589,7 +604,8 @@ window.MuseumFront = (function () {
                 <p class="mb-0 text-muted">Даты работы, кураторы и партнёры могут быть добавлены в описании.</p>
               </div>
             </div>
-            <a href="/exhibitions.html" class="small text-decoration-none">← Назад к экспозициям</a>
+            <a href="/tickets.html" class="btn btn-dark mb-3 w-100">Купить билет</a>
+            <a href="/exhibitions.html" class="small text-decoration-none d-block">← Назад к экспозициям</a>
           </div>
         </div>
       `;
