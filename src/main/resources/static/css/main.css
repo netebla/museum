@@ -1,0 +1,154 @@
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #111;
+}
+
+.museum-header .navbar-brand {
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.hero-section {
+  padding: 3.5rem 0 3rem;
+  background: radial-gradient(circle at top left, #f5f3ff 0, #ffffff 40%, #f8f9fa 100%);
+}
+
+@media (min-width: 992px) {
+  .hero-section {
+    padding: 4.5rem 0 4rem;
+  }
+}
+
+.hero-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+.hero-title {
+  font-size: clamp(2rem, 3vw + 1rem, 2.8rem);
+}
+
+.hero-text {
+  max-width: 32rem;
+}
+
+.hero-image-placeholder {
+  position: relative;
+  height: 260px;
+}
+
+.hero-frame {
+  position: absolute;
+  inset: 0;
+  border-radius: 1.8rem;
+  border: 1px solid #e0e0e0;
+  background: linear-gradient(135deg, #111 0, #333 35%, #888 100%);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+
+.section-padding {
+  padding: 3rem 0;
+}
+
+@media (min-width: 992px) {
+  .section-padding {
+    padding: 3.5rem 0;
+  }
+}
+
+.section-title {
+  font-size: 1.6rem;
+  margin-bottom: 0.25rem;
+}
+
+.section-subtitle {
+  color: #6c757d;
+  max-width: 32rem;
+}
+
+.event-card,
+.exhibition-card {
+  border-radius: 1rem;
+  border: 1px solid #e5e5e5;
+  background: #fff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.event-card-header {
+  padding: 1.1rem 1.25rem 0.75rem;
+}
+
+.event-card-body {
+  padding: 0 1.25rem 1.1rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.event-meta {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #888;
+}
+
+.event-title {
+  font-size: 1rem;
+  margin: 0.25rem 0 0.4rem;
+}
+
+.event-price {
+  font-weight: 500;
+}
+
+.badge-status {
+  border-radius: 999px;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.6rem;
+  border: 1px solid #dee2e6;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.link-more {
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: #111;
+}
+
+.link-more::after {
+  content: "→";
+  display: inline-block;
+  margin-left: 0.25rem;
+  transition: transform 0.15s ease;
+}
+
+.link-more:hover::after {
+  transform: translateX(2px);
+}
+
+.visit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+}
+
+.visit-grid h5 {
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.museum-footer {
+  background: #fff;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #f1f3f5;
+}
+

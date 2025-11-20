@@ -3,49 +3,181 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Музей — события и экспозиции</title>
+  <title>Музей — события, экспозиции и билеты</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style> body { padding-top: 2rem; } </style>
-  </head>
+  <link href="/css/main.css" rel="stylesheet">
+</head>
 <body>
-<div class="container">
-  <h1 class="mb-4">Музей</h1>
-  <div class="row">
-    <div class="col-md-6">
-      <h3>Мероприятия</h3>
-      <ul id="events" class="list-group"></ul>
+<header class="museum-header">
+  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+    <div class="container">
+      <a class="navbar-brand fw-semibold" href="/">Музей</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNavbar">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="#events">Афиша</a></li>
+          <li class="nav-item"><a class="nav-link" href="#exhibitions">Экспозиции</a></li>
+          <li class="nav-item"><a class="nav-link" href="#visit">Посещение</a></li>
+          <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+          <li class="nav-item ms-lg-3"><a class="btn btn-outline-dark btn-sm" href="/login">Вход</a></li>
+        </ul>
+      </div>
     </div>
-    <div class="col-md-6">
-      <h3>Экспозиции</h3>
-      <ul id="exhibitions" class="list-group"></ul>
+  </nav>
+
+  <section class="hero-section">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <p class="hero-kicker mb-2">Информационная система музея</p>
+          <h1 class="hero-title mb-3">События, экспозиции и билеты в одном месте</h1>
+          <p class="hero-text mb-4">
+            Следите за актуальной афишей, открывайте постоянные и временные экспозиции, планируйте визит и оформляйте билеты онлайн.
+          </p>
+          <div class="d-flex flex-wrap gap-2">
+            <a href="#events" class="btn btn-dark">Афиша мероприятий</a>
+            <a href="#visit" class="btn btn-outline-dark">Планировать визит</a>
+          </div>
+        </div>
+        <div class="col-lg-5 ms-lg-auto d-none d-lg-block">
+          <div class="hero-image-placeholder">
+            <div class="hero-frame"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</header>
+
+<main>
+  <section id="events" class="section-padding bg-light">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-end mb-3">
+        <div>
+          <h2 class="section-title">Ближайшие мероприятия</h2>
+          <p class="section-subtitle">Лекции, экскурсии, показы и специальные проекты.</p>
+        </div>
+      </div>
+      <div id="events-list" class="row g-3"></div>
+      <div class="text-end mt-3">
+        <a href="/events.html" class="link-more">Вся афиша</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="exhibitions" class="section-padding">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-end mb-3">
+        <div>
+          <h2 class="section-title">Экспозиции</h2>
+          <p class="section-subtitle">Постоянные и временные выставочные проекты.</p>
+        </div>
+      </div>
+      <div id="exhibitions-list" class="row g-3"></div>
+      <div class="text-end mt-3">
+        <a href="/exhibitions.html" class="link-more">Все экспозиции</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="visit" class="section-padding bg-light">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <h2 class="section-title">Планирование визита</h2>
+          <p class="section-subtitle mb-4">
+            Часы работы, адрес и базовая информация для посетителей. Данные приведены как пример — адаптируйте под ваш музей.
+          </p>
+          <div class="visit-grid">
+            <div>
+              <h5>Часы работы</h5>
+              <p class="mb-1">Пн: выходной</p>
+              <p class="mb-1">Вт–Пт: 11:00–20:00</p>
+              <p class="mb-1">Сб–Вс: 11:00–21:00</p>
+            </div>
+            <div>
+              <h5>Адрес</h5>
+              <p class="mb-1">Город, улица, дом</p>
+              <p class="mb-0 text-muted">Добавьте точный адрес и ориентиры.</p>
+            </div>
+            <div>
+              <h5>Билеты</h5>
+              <p class="mb-1">Основной билет: пример 500 ₽</p>
+              <p class="mb-0 text-muted">Льготные категории и бесплатные дни.</p>
+            </div>
+            <div>
+              <h5>Контакты</h5>
+              <p class="mb-1">info@museum.local</p>
+              <p class="mb-0">+7 (000) 000‑00‑00</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5 ms-lg-auto">
+          <div class="card shadow-sm border-0">
+            <div class="card-body">
+              <h5 class="card-title mb-3">Быстрая заявка на билет</h5>
+              <p class="small text-muted mb-3">
+                Для примера демонстрируется форма, которая использует REST API
+                <code>POST /api/events/{eventId}/tickets/purchase</code>.
+              </p>
+              <form id="ticket-form">
+                <div class="mb-3">
+                  <label class="form-label">Мероприятие</label>
+                  <select id="ticket-event" class="form-select" required></select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Имя и фамилия</label>
+                  <input id="ticket-name" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">E‑mail</label>
+                  <input id="ticket-email" type="email" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-dark w-100">Оформить заявку</button>
+                <div id="ticket-message" class="small mt-2"></div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" class="section-padding">
+    <div class="container">
+      <h2 class="section-title mb-3">Вопросы посетителей</h2>
+      <p class="section-subtitle mb-4">
+        Раздел заполняется через административную панель. Вопросы и ответы подгружаются с REST API.
+      </p>
+      <div class="accordion" id="faq-accordion"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="museum-footer border-top">
+  <div class="container d-flex flex-wrap justify-content-between align-items-center py-3">
+    <p class="mb-0 small text-muted">
+      Музей · Демо-информационная система на Spring Boot
+    </p>
+    <div class="d-flex gap-2">
+      <a href="/swagger-ui.html" class="small link-secondary">API (Swagger)</a>
+      <a href="/admin" class="small link-secondary">Админ‑панель</a>
     </div>
   </div>
-  <hr class="my-4">
-  <a class="btn btn-outline-primary" href="/swagger-ui.html">Открыть Swagger UI</a>
-  <a class="btn btn-primary ms-2" href="/admin">Админ-панель</a>
-  <a class="btn btn-outline-secondary ms-2" href="/login">Войти</a>
-  <p class="text-muted mt-2">Это простая демо-страница, использующая REST API.</p>
-</div>
-<script>
-  async function loadList(url, targetId, render) {
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-      const ul = document.getElementById(targetId);
-      ul.innerHTML = '';
-      data.forEach(item => {
-        const li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.innerHTML = render(item);
-        ul.appendChild(li);
-      });
-    } catch (e) {
-      console.error(e);
-    }
-  }
+</footer>
 
-  loadList('/api/events', 'events', e => `<strong>${e.title}</strong><br><small>${e.startDate} — ${e.endDate}</small>`);
-  loadList('/api/exhibitions', 'exhibitions', x => `<strong>${x.title}</strong><br><small>${x.status || ''}</small>`);
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/main.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    MuseumFront.loadEventsPreview('events-list');
+    MuseumFront.loadExhibitionsPreview('exhibitions-list');
+    MuseumFront.populateTicketEvents('ticket-event');
+    MuseumFront.initTicketForm('ticket-form', 'ticket-event', 'ticket-name', 'ticket-email', 'ticket-message');
+    MuseumFront.loadFaq('faq-accordion');
+  });
 </script>
 </body>
 </html>
