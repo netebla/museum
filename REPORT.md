@@ -1,0 +1,386 @@
+# Museum Information System — архитектура и реализация
+
+Этот документ описывает текущую архитектуру, реализацию и деплой проекта информационно‑справочной системы музея. Его можно использовать как основу для отчёта по курсовой работе.
+
+---
+
+## 1. Архитектура проекта
+
+**Технологический стек**
+
+- **Back‑end:** Java 17, Spring Boot 3  
+  Модули: Spring Web (REST + MVC), Spring Data JPA, Spring Security, Validation, Flyway.
+- **База данных:** PostgreSQL 17, миграции Flyway (`src/main/resources/db/migration`).
+- **Front‑end:** статический HTML/CSS/JS + Bootstrap 5 (CDN), собственный модуль JS `MuseumFront`.
+- **Шаблоны:** Thymeleaf для админ‑панели и страницы логина.
+- **Инфраструктура:** Docker, Docker Compose, GitHub Actions CI/CD, GitHub Container Registry (GHCR).
+- **Веб‑сервер:** nginx как reverse‑proxy на продакшн‑ВМ.
+- **Домен:** `kononovmuseum.ru`, привязанный к IP виртуальной машины.
+
+**Логическая структура**
+
+- **REST API** — управление сущностями музея (мероприятия, экспозиции, FAQ, билеты).
+- **Публичный фронтенд** — несколько HTML‑страниц, которые используют REST API.
+- **Админ‑панель** — CRUD‑управление контентом через веб‑формы (Thymeleaf).
+- **Система безопасности** — логин admin/admin, разграничение прав для публичных страниц и админки.
+- **Автоматический деплой** — при пуше в `main` запускается pipeline, который собирает Docker‑образ и обновляет приложение на ВМ.
+
+---
+
+## 2. Бэкенд: модели, DTO, REST API
+
+### 2.1. Модели данных (JPA‑сущности)
+
+Файлы в `src/main/java/com/museum/model`:
+
+- **`Event`** (`Event.java`) — сущность мероприятия:
+  - `id` — первичный ключ.
+  - `title` — название.
+  - `description` — описание (текст).
+  - `startDate`, `endDate` — даты начала и окончания (LocalDate).
+  - `hall` — зал/площадка.
+  - `ticketPrice` — цена билета.
+  - `ticketsTotal` — всего билетов.
+  - `ticketsSold` — продано билетов.
+  - `imageUrl` — URL изображения (афиша/обложка).
+
+- **`Exhibition`** (`Exhibition.java`) — сущность экспозиции:
+  - `id`, `title`, `description`.
+  - `hall` — зал.
+  - `status` — тип (`ExhibitionStatus`, например `PERMANENT`/`TEMPORARY`).
+  - `imageUrl` — URL изображения.
+
+- **`Faq`** (`Faq.java`) — сущность вопроса/ответа:
+  - `id`.
+  - `question` — вопрос.
+  - `answer` — ответ (текст).
+  - `category` — категория (например, “Билеты”, “Посещение”).
+
+Дополнительно используются `Ticket`, `User`, `UserRole`, `TicketStatus` — для билетов и безопасности.
+
+### 2.2. DTO и сервисы
+
+**DTO** (`src/main/java/com/museum/dto`):
+
+- `EventDto`:
+  - поля: `id`, `title`, `description`, `startDate`, `endDate`, `hall`, `ticketPrice`, `ticketsTotal`, `ticketsSold`, `imageUrl`;
+  - валидируются аннотациями `@NotBlank`, `@NotNull`, `@DecimalMin`, `@Min`, `@Size`;
+  - используются геттеры/сеттеры (JavaBean‑модель) для корректной работы Thymeleaf и валидации.
+- `ExhibitionDto` — DTO для экспозиций (`title`, `description`, `hall`, `status`, `imageUrl`).
+- `FaqDto` — DTO для вопроса/ответа.
+- `TicketPurchaseRequest` — DTO для покупки билета (`buyerName`, `buyerEmail`).
+
+**Сервисы** (`src/main/java/com/museum/service`):
+
+- `EventService`, `ExhibitionService`, `FaqService`, `TicketService` — тонкие сервисы над `JpaRepository`, предоставляющие методы `findAll`, `findById`, `save`, `deleteById` и т.п.
+
+### 2.3. REST‑контроллеры
+
+Файлы `src/main/java/com/museum/controller`:
+
+- **`EventController`** (`/api/events`):
+  - `GET /api/events` — список мероприятий.
+  - `GET /api/events/{id}` — одно мероприятие.
+  - `POST /api/events` — создать (из `EventDto`).
+  - `PUT /api/events/{id}` — обновить.
+  - `DELETE /api/events/{id}` — удалить.
+
+- **`ExhibitionController`** (`/api/exhibitions`):
+  - `GET /api/exhibitions` — список экспозиций.
+  - `GET /api/exhibitions/{id}` — одна экспозиция.
+  - `POST /api/exhibitions` / `PUT /api/exhibitions/{id}` / `DELETE /api/exhibitions/{id}` — CRUD.
+
+- **`FaqController`** (`/api/faq`):
+  - CRUD‑операции для вопрос/ответ (FAQ).
+
+- **`TicketController`** (`/api/events/{eventId}/tickets`):
+  - `POST /api/events/{eventId}/tickets/purchase` — покупка билета (создаёт `Ticket`, уменьшает доступные билеты).
+
+- **`ApiExceptionHandler`** — общий обработчик ошибок REST (возвращает структурированные ответы вместо сырых исключений).
+
+---
+
+## 3. Публичный фронтенд
+
+Все публичные страницы лежат в `src/main/resources/static` и используют REST API для динамических данных.
+
+### 3.1. Главная страница (`index.html`)
+
+Главные блоки:
+
+- **Навигация** — верхнее меню:
+  - ссылки на `/events.html` (Афиша), `/exhibitions.html` (Экспозиции), `/visit.html` (Посетителям), `/about.html` (О музее), `/login` (Вход).
+
+- **Hero‑секция**:
+  - слева текстовый блок с заголовком и кнопками;
+  - справа карусель ближайших мероприятий (Bootstrap carousel), наполняется функцией `initHeroCarousel` из `js/main.js`, данные берутся из `/api/events` (топ‑3 событий).
+
+- **Навигационные карточки по разделам** — быстрые переходы: Афиша, Экспозиции, Посетителям, О музее.
+
+- **Ближайшие мероприятия**:
+  - блок “Ближайшие мероприятия”, наполняется через `MuseumFront.loadEventsPreview('events-list')` (запрос к `/api/events`);
+  - карточки включают: картинку (`imageUrl`), заголовок, диапазон дат, зал, цену/пометку “вход свободный / по регистрации”, краткое описание и кнопки “Подробнее” и “Купить билет”.
+
+- **Экспозиции**:
+  - аналогичный блок “Экспозиции”, данные через `loadExhibitionsPreview` (из `/api/exhibitions`).
+
+- **Планирование визита** — статический блок с примерными часами работы, адресом, ценами и контактами.
+
+- **О музее** — краткий блок про миссию и формат музея + список “фактов”.
+
+- **Новости и анонсы** — статический список последних новостей (примерный контент).
+
+- **Футер** — контакты, соцсети, подпись “Демо‑информационная система”, ссылка на Swagger и админ‑панель.
+
+### 3.2. Афиша (`events.html`)
+
+Страница `Афиша` показывает все мероприятия:
+
+- Вверху фильтры:
+  - по дате: все / будущие / архив;
+  - по типу мероприятия (заглушка) — фильтрация по ключевым словам в названии (лекция, показ, экскурсия и т.п.).
+- Данные загружаются из `/api/events` через функцию `initEventsPage` (`js/main.js`).
+- Карточки повторяют стиль главной страницы: изображение, заголовок, даты, зал, цена, краткое описание, “Подробнее” и “Купить билет”.
+
+### 3.3. Экспозиции (`exhibitions.html`)
+
+Страница каталога экспозиций:
+
+- Фильтр по залу: список уникальных значений поля `hall`.
+- Фильтр по типу (`PERMANENT` / `TEMPORARY`).
+- Данные из `/api/exhibitions` через `initExhibitionsPage`.
+- Карточки: изображение, название, зал, статус (постоянная/временная), краткое описание и кнопки “Подробнее” / “Купить билет”.
+
+### 3.4. Детальные страницы (`event.html`, `exhibition.html`)
+
+Логика в `js/main.js` — функции `initEventDetail` и `initExhibitionDetail`:
+
+- Читают параметр `id` из URL (`?id=...`).
+- Пытаются загрузить объект по `/api/events/{id}` или `/api/exhibitions/{id}`;
+- В случае ошибки подстраховываются, загружая полный список (`/api/events` или `/api/exhibitions`) и ища объект по `id`.
+- Отрисовывается:
+  - заголовок;
+  - даты / зал / цена (для мероприятия) или статус / зал (для экспозиции);
+  - крупное изображение (`imageUrl`, если указано);
+  - основной текст описания (переносы строк сохраняются);
+  - блок справа с “Практической информацией” / “Фактами об экспозиции”;
+  - кнопка “Купить билет” (ведёт на `tickets.html` с параметром `eventId`);
+  - ссылка “Назад к афише / экспозициям”.
+
+### 3.5. Покупка билета (`tickets.html`)
+
+Страница реализует учебный сценарий покупки билета:
+
+- Шаг 1: выбор мероприятия из `/api/events` (селект, поддерживает автоподстановку через `?eventId=` в URL).
+- Шаг 2: выбор количества билетов (используется для расчёта суммы на фронте).
+- Шаг 3: ввод данных посетителя (имя, e‑mail).
+- Шаг 4: подтверждение покупки:
+  - отправка `POST /api/events/{id}/tickets/purchase` с `buyerName` и `buyerEmail`;
+  - при успехе — сообщение об успешной покупке и сводка заказа.
+
+### 3.6. Страницы `visit.html` и `about.html`
+
+- `visit.html`:
+  - Заголовок “Посетителям”.
+  - Аккордеон FAQ (через `loadFaq` → `/api/faq`), вопросы/ответы добавляются через API или админку в будущем.
+  - Блоки “Как добраться”, “Часы работы”, “Контакты”, “Правила посещения” — статические тексты, которые можно редактировать в HTML.
+
+- `about.html`:
+  - Длинный текст о миссии, истории и архитектуре музея (используется как заглушка/пример для курсовой).
+  - В правой колонке — карточки “Факты” и “Контакты”.
+
+---
+
+## 4. Общий JS‑модуль `MuseumFront`
+
+Основная логика фронтенда собрана в модуле `window.MuseumFront` (`src/main/resources/static/js/main.js`):
+
+- Вспомогательные функции:
+  - `fetchJson(url)` — запрос JSON с обработкой ошибок;
+  - `truncate(text, max)` — сокращение текста;
+  - `getQueryParam(name)` — чтение параметров URL;
+  - `formatDateRange(start, end)`, `isPastEvent`, `isUpcomingEvent`.
+
+- Рендер карточек:
+  - `renderEventCard(e)` — создаёт DOM‑карточку мероприятия (с превью‑изображением);
+  - `renderExhibitionCard(x)` — аналогично для экспозиций.
+
+- Загрузка блоков:
+  - `loadEventsPreview`, `loadEventsGrid`;
+  - `loadExhibitionsPreview`, `loadExhibitionsGrid`;
+  - `populateTicketEvents`, `initTicketForm`;
+  - `loadFaq`.
+
+- Страницы:
+  - `initHeroCarousel` — карусель с ближайшими событиями на главной;
+  - `initEventsPage` — афиша с фильтрами;
+  - `initExhibitionsPage` — экспозиции с фильтрами;
+  - `initEventDetail`, `initExhibitionDetail` — детальные страницы;
+  - `initTicketsPage` — сценарий покупки билета.
+
+---
+
+## 5. Админ‑панель
+
+Админ‑панель реализована через Thymeleaf‑шаблоны и MVC‑контроллер `AdminController`.
+
+### 5.1. Структура шаблонов
+
+Файлы `src/main/resources/templates/admin`:
+
+- `index.html` — главная страница админки:
+  - ссылки на `/admin/events` и `/admin/exhibitions`;
+  - ссылки на `/` (главная сайта) и `/swagger-ui.html`.
+
+- `events.html` — управление мероприятиями:
+  - Список всех мероприятий в таблице:
+    - название, диапазон дат, зал;
+    - кнопки `Редактировать` и `Удалить`.
+  - Форма создания/редактирования мероприятия:
+    - скрытое поле `id`;
+    - поля `title`, `description`, даты, `hall`, `ticketPrice`, `ticketsTotal`, `imageUrl`.
+
+- `exhibitions.html` — управление экспозициями:
+  - таблица экспозиций;
+  - форма создания экспозиции (название, описание, зал, статус, `imageUrl`). 
+
+### 5.2. Контроллер `AdminController`
+
+Файл: `src/main/java/com/museum/controller/AdminController.java`.
+
+Основные методы:
+
+- `GET /admin` — главная админки.
+- `GET /admin/events` — список мероприятий + пустая форма `EventDto`.
+- `POST /admin/events` — upsert:
+  - если в `EventDto.id` задано значение, контроллер пытается найти существующее событие и обновляет его;
+  - если `id == null`, создаётся новое мероприятие.
+- `GET /admin/events/{id}/edit` — загружает мероприятие и заполняет форму для редактирования.
+- `POST /admin/events/{id}/delete` — удаляет мероприятие.
+
+Аналогично реализованы методы для экспозиций (`/admin/exhibitions`).
+
+---
+
+## 6. Безопасность и права доступа
+
+Настройки в `src/main/java/com/museum/config/SecurityConfig.java`:
+
+- **CSRF:**
+  - включён по умолчанию;
+  - отключён для `/api/**`, `/swagger-ui/**`, `/v3/api-docs/**` (для удобства работы REST‑клиентов и Swagger).
+
+- **Публичные ресурсы (доступны без логина):**
+  - `/`, `/index.html`
+  - `/events.html`, `/event.html`
+  - `/exhibitions.html`, `/exhibition.html`
+  - `/tickets.html`, `/visit.html`, `/about.html`
+  - статические файлы: `/css/**`, `/js/**`, `/images/**`
+  - Swagger: `/swagger-ui.html`, `/swagger-ui/**`, `/v3/api-docs/**`
+
+- **Публичные API:**
+  - `GET /api/**` — чтение доступно всем;
+  - `POST /api/events/*/tickets/purchase` — покупка билета доступна без логина.
+
+- **Админские функции:**
+  - `/admin/**` — только роли `ADMIN`/`MANAGER`.
+  - `POST/PUT/DELETE /api/**` — изменения в данных только для `ADMIN`/`MANAGER`.
+
+- **Аутентификация:**
+  - форма логина `/login` (шаблон `templates/login.html`);
+  - после успешного входа — редирект на `/swagger-ui.html`;
+  - дефолтный админ создаётся при старте приложения (`DevAdminInitializer`): `admin / admin`.
+
+---
+
+## 7. Развёртывание, CI/CD и инфраструктура
+
+### 7.1. Локальная разработка
+
+- Используется `docker-compose.yml` в корне проекта:
+  - сервис `db` — Postgres 17;
+  - сервис `app` — приложение на порту 8080, переменные окружения `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`.
+
+Запуск локально:
+
+```bash
+docker compose up --build
+# или
+mvn spring-boot:run (при уже поднятой БД)
+```
+
+### 7.2. CI (сборка и тесты)
+
+Файл `.github/workflows/ci.yml`:
+
+- Сборка на каждый push/PR:
+  - `mvn test` + `mvn package`;
+  - проверка, что проект собирается и тесты проходят.
+
+### 7.3. CD (деплой на ВМ)
+
+Файл `.github/workflows/deploy.yml`:
+
+1. job `docker`:
+   - собирает JAR (`mvn -DskipTests package`);
+   - собирает Docker‑образ и пушит в GHCR (`ghcr.io/<owner>/museum:latest`).
+
+2. job `deploy` (по SSH на ВМ):
+   - логинится в GHCR и делает `docker pull` образа;
+   - создаёт сеть `museum-net` и подключает к ней контейнер БД `museum-db`;
+   - останавливает и удаляет старый контейнер `museum`;
+   - запускает новый контейнер:
+     ```bash
+     docker run -d --name museum \
+       --network museum-net \
+       -e DB_URL='${PROD_DB_URL}' \
+       -e DB_USERNAME='${PROD_DB_USERNAME}' \
+       -e DB_PASSWORD='${PROD_DB_PASSWORD}' \
+       -p 8080:8080 \
+       IMAGE
+     ```
+   - переменные `PROD_DB_URL`, `PROD_DB_USERNAME`, `PROD_DB_PASSWORD`, а также `SSH_HOST`, `SSH_USER`, `SSH_KEY` задаются как **секреты** репозитория GitHub.
+
+### 7.4. ВМ и nginx
+
+На виртуальной машине:
+
+- Запущены контейнеры:
+  - `museum-db` (Postgres 17);
+  - `museum` (Spring Boot, порт 8080);
+  - (опционально другие сервисы).
+
+- nginx настроен как reverse‑proxy:
+  - принимает запросы на `kononovmuseum.ru:80`;
+  - проксирует их на `http://127.0.0.1:8080`.
+
+При необходимости включается HTTPS через Certbot (`certbot --nginx`), который добавляет SSL‑конфигурацию и автопродление сертификатов Let’s Encrypt.
+
+---
+
+## 8. Наполнение контентом
+
+Практическая схема, как наполнить сайт:
+
+- **Мероприятия:**
+  - зайти в `/login` (admin/admin);
+  - перейти в `/admin/events`;
+  - создать/отредактировать мероприятия (дату, зал, цену, описание, `imageUrl`).
+
+- **Экспозиции:**
+  - `/admin/exhibitions` — добавить экспозиции.
+
+- **FAQ:**
+  - пока через Swagger (`POST /api/faq`), далее можно расширить админку.
+
+- **Изображения:**
+  - файлы кладутся в `src/main/resources/static/images` и коммитятся в Git;
+  - в админке указывается путь вида `/images/название-файла.jpg`.
+
+- **Тексты “О музее”, новости, часы работы:**
+  - редактируются прямо в HTML (`index.html`, `visit.html`, `about.html`).
+
+---
+
+Этот документ отражает текущее состояние системы и описывает ключевые технические решения. На его основе можно оформить формальный отчёт: добавить введение, постановку задачи, анализ аналогов, план работ, результаты тестирования и заключение. Для этого достаточно ссылаться на соответствующие разделы (архитектура, реализация, деплой, интерфейс).
+
