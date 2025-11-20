@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public class ExhibitionDto {
+    public Long id;
+
     @NotBlank
     @Size(max = 150)
     public String title;
@@ -14,6 +16,9 @@ public class ExhibitionDto {
     public ExhibitionStatus status;
     @Size(max = 255)
     public String imageUrl;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
