@@ -19,6 +19,9 @@
         <li class="nav-item"><a class="nav-link" href="/">Главная</a></li>
         <li class="nav-item"><a class="nav-link" href="/events.html">Афиша</a></li>
         <li class="nav-item"><a class="nav-link active" aria-current="page" href="/exhibitions.html">Экспозиции</a></li>
+        <li class="nav-item"><a class="nav-link" href="/visit.html">Посетителям</a></li>
+        <li class="nav-item"><a class="nav-link" href="/about.html">О музее</a></li>
+        <li class="nav-item"><a class="nav-link" href="/author.html">Об авторе</a></li>
         <li class="nav-item ms-lg-3"><a class="btn btn-outline-dark btn-sm" href="/login">Вход</a></li>
       </ul>
     </div>
@@ -36,13 +39,13 @@
       </div>
     </div>
     <div class="row g-3 mb-3">
-      <div class="col-md-4">
+      <div class="col-md-3">
         <label class="form-label small text-uppercase text-muted mb-1">Зал</label>
         <select id="exh-hall-filter" class="form-select form-select-sm">
           <option value="all">Все залы</option>
         </select>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-3">
         <label class="form-label small text-uppercase text-muted mb-1">Тип</label>
         <select id="exh-status-filter" class="form-select form-select-sm">
           <option value="all">Все</option>
@@ -50,8 +53,16 @@
           <option value="TEMPORARY">Временная выставка</option>
         </select>
       </div>
-      <div class="col-md-4 d-flex align-items-end justify-content-md-end">
-        <button id="exh-reset" class="btn btn-outline-secondary btn-sm" type="button">Сбросить фильтры</button>
+      <div class="col-md-3">
+        <label class="form-label small text-uppercase text-muted mb-1">Поиск</label>
+        <input id="exh-search" type="search" class="form-control form-control-sm" placeholder="Поиск по названию и описанию">
+      </div>
+      <div class="col-md-3 d-flex align-items-end justify-content-md-end gap-2">
+        <select id="exh-sort" class="form-select form-select-sm w-auto">
+          <option value="title">По названию</option>
+          <option value="hall">По залу</option>
+        </select>
+        <button id="exh-reset" class="btn btn-outline-secondary btn-sm" type="button">Сбросить</button>
       </div>
     </div>
     <div id="exhibitions-list-full" class="row g-3"></div>

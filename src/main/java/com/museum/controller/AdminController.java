@@ -28,8 +28,13 @@ public class AdminController {
     }
 
     @GetMapping("/events")
-    public String events(Model model) {
-        model.addAttribute("events", eventService.findAll());
+    public String events(@RequestParam(name = "q", required = false) String q, Model model) {
+        if (q != null && !q.isBlank()) {
+            model.addAttribute("events", eventService.findByTitle(q));
+        } else {
+            model.addAttribute("events", eventService.findAll());
+        }
+        model.addAttribute("query", q);
         model.addAttribute("form", new EventDto());
         return "admin/events";
     }

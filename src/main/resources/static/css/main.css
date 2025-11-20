@@ -49,11 +49,17 @@ body {
 
 .hero-slide-inner {
   min-height: 260px;
-  padding: 1.5rem 3.5rem 1.5rem 1.75rem;
+  padding: 1.5rem 3.5rem;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   color: #fff;
+}
+
+@media (max-width: 767.98px) {
+  .hero-carousel {
+    margin-top: 1.5rem;
+  }
 }
 
 .hero-slide-meta {

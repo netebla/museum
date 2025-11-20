@@ -16,8 +16,8 @@ public class EventService {
     }
 
     public List<Event> findAll() { return repo.findAll(); }
+    public List<Event> findByTitle(String q) { return repo.findByTitleContainingIgnoreCase(q); }
     public Optional<Event> findById(Long id) { return repo.findById(id); }
     public Event save(Event e) { return repo.save(e); }
     public void deleteById(Long id) { repo.deleteById(id); }
 }
-

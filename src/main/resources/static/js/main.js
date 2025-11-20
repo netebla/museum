@@ -417,6 +417,8 @@ window.MuseumFront = (function () {
     const typeFilter = document.getElementById(typeFilterId);
     const resetBtn = document.getElementById(resetId);
     if (!container || !dateFilter || !typeFilter || !resetBtn) return;
+    const searchInput = document.getElementById("events-search");
+    const sortSelect = document.getElementById("events-sort");
 
     let events = [];
 
@@ -428,6 +430,8 @@ window.MuseumFront = (function () {
       }
       const dateValue = dateFilter.value;
       const typeValue = typeFilter.value;
+      const query = searchInput ? (searchInput.value || "").toLowerCase() : "";
+      const sortValue = sortSelect ? sortSelect.value : "date";
       let list = events.slice();
       if (dateValue === "upcoming") {
         list = list.filter(isUpcomingEvent);
@@ -445,6 +449,28 @@ window.MuseumFront = (function () {
           keywords.some(k => (e.title || "").toLowerCase().includes(k))
         );
       }
+      if (query) {
+        list = list.filter(e => {
+          const t = (e.title || "").toLowerCase();
+          const d = (e.description || "").toLowerCase();
+          return t.includes(query) || d.includes(query);
+        });
+      }
+      list.sort((a, b) => {
+        if (sortValue === "title") {
+          return (a.title || "").localeCompare(b.title || "", "ru");
+        }
+        if (sortValue === "price_asc" || sortValue === "price_desc") {
+          const pa = a.ticketPrice != null ? Number(a.ticketPrice) : Infinity;
+          const pb = b.ticketPrice != null ? Number(b.ticketPrice) : Infinity;
+          const base = pa - pb;
+          return sortValue === "price_asc" ? base : -base;
+        }
+        // default: по дате начала
+        const da = a.startDate || "";
+        const db = b.startDate || "";
+        return da.localeCompare(db);
+      });
       if (!list.length) {
         container.innerHTML = '<p class="text-muted">По выбранным фильтрам мероприятий не найдено.</p>';
         return;
@@ -462,9 +488,17 @@ window.MuseumFront = (function () {
 
     dateFilter.addEventListener("change", render);
     typeFilter.addEventListener("change", render);
+    if (searchInput) {
+      searchInput.addEventListener("input", render);
+    }
+    if (sortSelect) {
+      sortSelect.addEventListener("change", render);
+    }
     resetBtn.addEventListener("click", function () {
       dateFilter.value = "all";
       typeFilter.value = "all";
+      if (searchInput) searchInput.value = "";
+      if (sortSelect) sortSelect.value = "date";
       render();
     });
   }
@@ -475,6 +509,8 @@ window.MuseumFront = (function () {
     const statusFilter = document.getElementById(statusFilterId);
     const resetBtn = document.getElementById(resetId);
     if (!container || !hallFilter || !statusFilter || !resetBtn) return;
+    const searchInput = document.getElementById("exh-search");
+    const sortSelect = document.getElementById("exh-sort");
 
     let exhibitions = [];
 
@@ -486,6 +522,8 @@ window.MuseumFront = (function () {
       }
       const hallValue = hallFilter.value;
       const statusValue = statusFilter.value;
+      const query = searchInput ? (searchInput.value || "").toLowerCase() : "";
+      const sortValue = sortSelect ? sortSelect.value : "title";
       let list = exhibitions.slice();
       if (hallValue !== "all") {
         list = list.filter(x => (x.hall || "") === hallValue);
@@ -493,6 +531,20 @@ window.MuseumFront = (function () {
       if (statusValue !== "all") {
         list = list.filter(x => (x.status || "") === statusValue);
       }
+      if (query) {
+        list = list.filter(x => {
+          const t = (x.title || "").toLowerCase();
+          const d = (x.description || "").toLowerCase();
+          return t.includes(query) || d.includes(query);
+        });
+      }
+      list.sort((a, b) => {
+        if (sortValue === "hall") {
+          return (a.hall || "").localeCompare(b.hall || "", "ru");
+        }
+        // default: по названию
+        return (a.title || "").localeCompare(b.title || "", "ru");
+      });
       if (!list.length) {
         container.innerHTML = '<p class="text-muted">По выбранным фильтрам экспозиции не найдены.</p>';
         return;
@@ -523,9 +575,17 @@ window.MuseumFront = (function () {
 
     hallFilter.addEventListener("change", render);
     statusFilter.addEventListener("change", render);
+    if (searchInput) {
+      searchInput.addEventListener("input", render);
+    }
+    if (sortSelect) {
+      sortSelect.addEventListener("change", render);
+    }
     resetBtn.addEventListener("click", function () {
       hallFilter.value = "all";
       statusFilter.value = "all";
+      if (searchInput) searchInput.value = "";
+      if (sortSelect) sortSelect.value = "title";
       render();
     });
   }
