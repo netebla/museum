@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class EventDto {
+    public Long id;
+
     @NotBlank
     @Size(max = 150)
     public String title;
@@ -23,6 +25,9 @@ public class EventDto {
     public Integer ticketsSold;
     @Size(max = 255)
     public String imageUrl;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }

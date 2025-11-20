@@ -35,12 +35,14 @@ public class AdminController {
     }
 
     @PostMapping("/events")
-    public String createEvent(@Valid @ModelAttribute("form") EventDto form, BindingResult br, Model model) {
+    public String createOrUpdateEvent(@Valid @ModelAttribute("form") EventDto form, BindingResult br, Model model) {
         if (br.hasErrors()) {
             model.addAttribute("events", eventService.findAll());
             return "admin/events";
         }
-        var e = new com.museum.model.Event();
+        com.museum.model.Event e = form.getId() != null
+                ? eventService.findById(form.getId()).orElseGet(com.museum.model.Event::new)
+                : new com.museum.model.Event();
         e.setTitle(form.title);
         e.setDescription(form.description);
         e.setStartDate(form.startDate);
@@ -58,6 +60,30 @@ public class AdminController {
     public String deleteEvent(@PathVariable Long id) {
         eventService.deleteById(id);
         return "redirect:/admin/events";
+    }
+
+    @GetMapping("/events/{id}/edit")
+    public String editEvent(@PathVariable Long id, Model model) {
+        var opt = eventService.findById(id);
+        if (opt.isEmpty()) {
+            return "redirect:/admin/events";
+        }
+        var e = opt.get();
+        var dto = new EventDto();
+        dto.setId(e.getId());
+        dto.setTitle(e.getTitle());
+        dto.setDescription(e.getDescription());
+        dto.setStartDate(e.getStartDate());
+        dto.setEndDate(e.getEndDate());
+        dto.setHall(e.getHall());
+        dto.setTicketPrice(e.getTicketPrice());
+        dto.setTicketsTotal(e.getTicketsTotal());
+        dto.setTicketsSold(e.getTicketsSold());
+        dto.setImageUrl(e.getImageUrl());
+
+        model.addAttribute("events", eventService.findAll());
+        model.addAttribute("form", dto);
+        return "admin/events";
     }
 
     @GetMapping("/exhibitions")
