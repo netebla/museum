@@ -57,13 +57,13 @@ public class AdminController {
     }
 
     @PostMapping("/events/{id}/delete")
-    public String deleteEvent(@PathVariable Long id) {
+    public String deleteEvent(@PathVariable("id") Long id) {
         eventService.deleteById(id);
         return "redirect:/admin/events";
     }
 
     @GetMapping("/events/{id}/edit")
-    public String editEvent(@PathVariable Long id, Model model) {
+    public String editEvent(@PathVariable("id") Long id, Model model) {
         var opt = eventService.findById(id);
         if (opt.isEmpty()) {
             return "redirect:/admin/events";
@@ -112,7 +112,7 @@ public class AdminController {
     }
 
     @PostMapping("/exhibitions/{id}/delete")
-    public String deleteExhibition(@PathVariable Long id) {
+    public String deleteExhibition(@PathVariable("id") Long id) {
         exhibitionService.deleteById(id);
         return "redirect:/admin/exhibitions";
     }
