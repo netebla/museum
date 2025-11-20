@@ -71,7 +71,23 @@
         <button id="events-reset" class="btn btn-outline-secondary btn-sm" type="button">Сбросить</button>
       </div>
     </div>
-    <div id="events-list-full" class="row g-3"></div>
+    <div id="events-list-full" class="row g-3 mb-4"></div>
+
+    <hr class="my-4">
+
+    <div class="d-flex justify-content-between align-items-end mb-3">
+      <div>
+        <h2 class="h4 mb-1">Экспозиции в музее</h2>
+        <p class="section-subtitle mb-0">
+          Ближайшие выставки и постоянные экспозиции из <code>/api/exhibitions</code>.
+        </p>
+      </div>
+      <div>
+        <a href="/exhibitions.html" class="btn btn-outline-dark btn-sm">Все экспозиции</a>
+      </div>
+    </div>
+
+    <div id="events-exhibitions-list" class="row g-3"></div>
   </div>
 </main>
 
@@ -90,6 +106,7 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     MuseumFront.initEventsPage('events-list-full', 'events-date-filter', 'events-type-filter', 'events-reset');
+    MuseumFront.loadExhibitionsPreview('events-exhibitions-list');
   });
 </script>
 </body>
