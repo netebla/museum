@@ -35,6 +35,8 @@ public class SecurityConfig {
                         "/tickets.html",
                         "/visit.html",
                         "/about.html",
+                        "/favicon.ico",
+                        "/favicon.png",
                         "/static/**",
                         "/css/**",
                         "/js/**",
