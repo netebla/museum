@@ -2,6 +2,7 @@ package com.museum.service;
 
 import com.museum.model.Event;
 import com.museum.model.Ticket;
+import com.museum.model.User;
 import com.museum.repository.EventRepository;
 import com.museum.repository.TicketRepository;
 import org.springframework.stereotype.Service;
@@ -13,14 +14,18 @@ import java.time.OffsetDateTime;
 public class TicketService {
     private final TicketRepository ticketRepository;
     private final EventRepository eventRepository;
+    private final NotificationService notificationService;
 
-    public TicketService(TicketRepository ticketRepository, EventRepository eventRepository) {
+    public TicketService(TicketRepository ticketRepository,
+                         EventRepository eventRepository,
+                         NotificationService notificationService) {
         this.ticketRepository = ticketRepository;
         this.eventRepository = eventRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional
-    public Ticket purchase(Long eventId, String buyerName, String buyerEmail) {
+    public Ticket purchase(Long eventId, String buyerName, String buyerEmail, User user) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found: " + eventId));
         Integer total = event.getTicketsTotal() == null ? 0 : event.getTicketsTotal();
@@ -33,10 +38,12 @@ public class TicketService {
 
         Ticket t = new Ticket();
         t.setEvent(event);
+        t.setUser(user);
         t.setBuyerName(buyerName);
         t.setBuyerEmail(buyerEmail);
         t.setPurchaseDate(OffsetDateTime.now());
-        return ticketRepository.save(t);
+        Ticket saved = ticketRepository.save(t);
+        notificationService.sendTicketPurchaseConfirmation(saved);
+        return saved;
     }
 }
-

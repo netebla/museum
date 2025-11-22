@@ -15,6 +15,18 @@ spring:
   flyway:
     enabled: true
 
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:25}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_SMTP_AUTH:false}
+          starttls:
+            enable: ${MAIL_SMTP_STARTTLS:false}
+
 server:
   port: ${PORT:8080}
 
@@ -29,3 +41,6 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
+app:
+  notifications:
+    from: ${NOTIFY_FROM_EMAIL:no-reply@museum.local}

@@ -386,6 +386,17 @@ window.MuseumFront = (function () {
         item.className = "carousel-item" + (index === 0 ? " active" : "");
         const inner = document.createElement("div");
         inner.className = "hero-slide-inner";
+
+        if (e.imageUrl) {
+          const imgWrap = document.createElement("div");
+          imgWrap.className = "hero-slide-image";
+          const img = document.createElement("img");
+          img.src = e.imageUrl;
+          img.alt = e.title || "Обложка мероприятия";
+          imgWrap.appendChild(img);
+          inner.appendChild(imgWrap);
+        }
+
         const meta = document.createElement("div");
         meta.className = "hero-slide-meta";
         meta.textContent = formatDateRange(e.startDate, e.endDate);
@@ -742,6 +753,22 @@ window.MuseumFront = (function () {
     if (!eventSelect || !qtyInput || !totalInput || !nameInput || !emailInput || !form || !message) return;
 
     let events = [];
+    try {
+      const res = await fetch("/api/me");
+      if (res.ok) {
+        const me = await res.json();
+        if (me.fullName && !nameInput.value) {
+          nameInput.value = me.fullName;
+        } else if (me.username && !nameInput.value) {
+          nameInput.value = me.username;
+        }
+        if (me.email && !emailInput.value) {
+          emailInput.value = me.email;
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
     let selectedEvent = null;
 
     function updateSummary() {

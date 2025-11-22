@@ -17,6 +17,10 @@ public class Ticket {
     @JoinColumn(name = "event_id")
     private Event event;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @NotBlank
     @Size(max = 100)
     @Column(name = "buyer_name")
@@ -37,6 +41,8 @@ public class Ticket {
     public void setId(Long id) { this.id = id; }
     public Event getEvent() { return event; }
     public void setEvent(Event event) { this.event = event; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
     public String getBuyerName() { return buyerName; }
     public void setBuyerName(String buyerName) { this.buyerName = buyerName; }
     public String getBuyerEmail() { return buyerEmail; }
@@ -46,4 +52,3 @@ public class Ticket {
     public OffsetDateTime getPurchaseDate() { return purchaseDate; }
     public void setPurchaseDate(OffsetDateTime purchaseDate) { this.purchaseDate = purchaseDate; }
 }
-

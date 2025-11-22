@@ -56,6 +56,21 @@ body {
   color: #fff;
 }
 
+.hero-slide-image {
+  width: 100%;
+  margin-bottom: 0.75rem;
+  border-radius: 1.2rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.hero-slide-image img {
+  display: block;
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
 @media (max-width: 767.98px) {
   .hero-carousel {
     margin-top: 1.5rem;

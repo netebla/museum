@@ -46,8 +46,8 @@ public class SecurityConfig {
                         "/swagger-ui/**",
                         "/v3/api-docs/**"
                 ).permitAll()
-                // Страница логина
-                .requestMatchers("/login").permitAll()
+                // Страницы логина и регистрации
+                .requestMatchers("/login", "/register").permitAll()
 
                 // Публичные GET-запросы к API
                 .requestMatchers(HttpMethod.GET, "/api/**").permitAll()

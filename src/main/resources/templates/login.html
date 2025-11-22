@@ -17,7 +17,7 @@
           <h4 class="mb-3">Вход</h4>
           <form method="post" th:action="@{/login}">
             <div class="mb-3">
-              <label class="form-label">Логин</label>
+              <label class="form-label">E‑mail</label>
               <input class="form-control" name="username" required>
             </div>
             <div class="mb-3">
@@ -27,12 +27,13 @@
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
             <button type="submit" class="btn btn-primary w-100">Войти</button>
           </form>
-          <div class="mt-3">
+          <div class="mt-3 d-flex justify-content-between">
             <a href="/">На главную</a>
+            <a href="/register">Регистрация</a>
           </div>
         </div>
       </div>
-      <div class="text-muted small mt-2">Демо: admin / admin</div>
+      <div class="text-muted small mt-2">Демо-админ: admin / admin</div>
     </div>
   </div>
   </div>
