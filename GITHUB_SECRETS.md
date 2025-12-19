@@ -83,6 +83,35 @@
 
 Остальные секреты для почты можно не добавлять, если они совпадают со значениями по умолчанию в `application.yml`.
 
+## Решение проблем с почтой
+
+### Проблема: SSL сертификат не соответствует домену
+Если в логах появляется ошибка `SSLHandshakeException: No subject alternative DNS name matching mail.kononovmuseum.ru found`:
+- В конфигурации уже отключена проверка SSL сертификата (`ssl.checkserveridentity: false`)
+- Это безопасно для внутреннего использования
+- Для продакшена рекомендуется настроить правильные SSL сертификаты в reg.ru
+
+### Проблема: Письма не отправляются
+1. Проверьте логи: `docker logs museum | grep -i mail`
+2. Убедитесь, что `MAIL_PASSWORD` указан в секретах GitHub
+3. Проверьте, что почтовый ящик создан в reg.ru
+4. Убедитесь, что SMTP отправка включена в настройках reg.ru
+
+### Просмотр логов
+```bash
+# Все логи
+docker logs museum
+
+# В реальном времени
+docker logs -f museum
+
+# Последние 100 строк
+docker logs --tail 100 museum
+
+# Поиск ошибок почты
+docker logs museum | grep -i "mail\|email\|ticket"
+```
+
 ## Безопасность
 
 ⚠️ **Важно:**
