@@ -289,9 +289,30 @@ window.MuseumFront = (function () {
       if (select.disabled) return;
 
       const eventId = select.value;
+      if (!eventId) {
+        msg.textContent = "Пожалуйста, выберите мероприятие.";
+        msg.classList.add("text-danger");
+        return;
+      }
+
+      const buyerName = nameInput.value.trim();
+      const buyerEmail = emailInput.value.trim();
+
+      if (!buyerName) {
+        msg.textContent = "Пожалуйста, укажите имя и фамилию.";
+        msg.classList.add("text-danger");
+        return;
+      }
+
+      if (!buyerEmail) {
+        msg.textContent = "Пожалуйста, укажите e‑mail.";
+        msg.classList.add("text-danger");
+        return;
+      }
+
       const payload = {
-        buyerName: nameInput.value,
-        buyerEmail: emailInput.value
+        buyerName: buyerName,
+        buyerEmail: buyerEmail
       };
 
       try {
@@ -301,7 +322,17 @@ window.MuseumFront = (function () {
           body: JSON.stringify(payload)
         });
         if (!res.ok) {
-          msg.textContent = "Не удалось оформить заявку. Проверьте данные.";
+          let errorMessage = "Не удалось оформить заявку. Проверьте данные.";
+          try {
+            const errorData = await res.json();
+            if (errorData.message) {
+              errorMessage = errorData.message;
+            }
+          } catch (e) {
+            // Если не удалось распарсить JSON, используем сообщение по умолчанию
+            console.error("Failed to parse error response:", e);
+          }
+          msg.textContent = errorMessage;
           msg.classList.add("text-danger");
           return;
         }
@@ -859,11 +890,21 @@ window.MuseumFront = (function () {
           body: JSON.stringify(payload)
         });
         if (!res.ok) {
-          message.textContent = "Не удалось оформить покупку. Проверьте данные.";
+          let errorMessage = "Не удалось оформить покупку. Проверьте данные.";
+          try {
+            const errorData = await res.json();
+            if (errorData.message) {
+              errorMessage = errorData.message;
+            }
+          } catch (e) {
+            // Если не удалось распарсить JSON, используем сообщение по умолчанию
+            console.error("Failed to parse error response:", e);
+          }
+          message.textContent = errorMessage;
           message.classList.add("text-danger");
           return;
         }
-        message.textContent = "Покупка оформлена. Детали заказа отправлены на e‑mail (пример).";
+        message.textContent = "Покупка оформлена. Детали заказа отправлены на e‑mail.";
         message.classList.add("text-success");
       } catch (err) {
         console.error(err);
