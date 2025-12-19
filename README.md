@@ -23,6 +23,20 @@
 - `DB_USERNAME` (по умолчанию `museum`)
 - `DB_PASSWORD` (по умолчанию `museum`)
 
+Настройка почты (для отправки уведомлений о заявках на билеты):
+- `MAIL_HOST` (по умолчанию `mail.kononovmuseum.ru`)
+- `MAIL_PORT` (по умолчанию `587`)
+- `MAIL_USERNAME` (по умолчанию `no-reply@kononovmuseum.ru`)
+- `MAIL_PASSWORD` — пароль от почтового ящика (обязательно указать)
+- `MAIL_SMTP_AUTH` (по умолчанию `true`)
+- `MAIL_SMTP_STARTTLS` (по умолчанию `true`)
+- `NOTIFY_FROM_EMAIL` (по умолчанию `no-reply@kononovmuseum.ru`)
+
+**Важно:** Для работы отправки почты необходимо:
+1. Создать почтовый ящик `no-reply@kononovmuseum.ru` в панели управления reg.ru
+2. Указать пароль от этого ящика в переменной окружения `MAIL_PASSWORD`
+3. Убедиться, что SMTP отправка включена в настройках почты reg.ru
+
 ## Основные эндпоинты
 - `GET /api/events` — список мероприятий
 - `POST /api/events` — создать мероприятие
@@ -71,6 +85,14 @@
    - `PROD_DB_URL` — например, `jdbc:postgresql://localhost:5432/museum`
    - `PROD_DB_USERNAME` — например, `museum`
    - `PROD_DB_PASSWORD` — например, `museum`
+   - **Секреты для почты (reg.ru):**
+     - `MAIL_HOST` — `mail.kononovmuseum.ru` (или оставьте пустым, используется значение по умолчанию)
+     - `MAIL_PORT` — `587` (или оставьте пустым, используется значение по умолчанию)
+     - `MAIL_USERNAME` — `no-reply@kononovmuseum.ru` (или оставьте пустым, используется значение по умолчанию)
+     - `MAIL_PASSWORD` — **обязательно** пароль от почтового ящика `no-reply@kononovmuseum.ru`
+     - `MAIL_SMTP_AUTH` — `true` (или оставьте пустым, используется значение по умолчанию)
+     - `MAIL_SMTP_STARTTLS` — `true` (или оставьте пустым, используется значение по умолчанию)
+     - `NOTIFY_FROM_EMAIL` — `no-reply@kononovmuseum.ru` (или оставьте пустым, используется значение по умолчанию)
 6. На ВМ установите Docker и откройте порт 8080. Убедитесь, что PostgreSQL доступен по `PROD_DB_URL`.
 7. Теперь при каждом push в `main` запустится пайплайн сборки и деплоя.
 

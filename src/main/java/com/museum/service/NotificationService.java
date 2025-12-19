@@ -18,7 +18,7 @@ public class NotificationService {
     private final String fromAddress;
 
     public NotificationService(JavaMailSender mailSender,
-                               @Value("${app.notifications.from:no-reply@museum.local}") String fromAddress) {
+                               @Value("${app.notifications.from:no-reply@kononovmuseum.ru}") String fromAddress) {
         this.mailSender = mailSender;
         this.fromAddress = fromAddress;
     }

@@ -61,5 +61,12 @@ jobs:
               -e DB_URL='${{ secrets.PROD_DB_URL }}' \
               -e DB_USERNAME='${{ secrets.PROD_DB_USERNAME }}' \
               -e DB_PASSWORD='${{ secrets.PROD_DB_PASSWORD }}' \
+              -e MAIL_HOST='${{ secrets.MAIL_HOST }}' \
+              -e MAIL_PORT='${{ secrets.MAIL_PORT }}' \
+              -e MAIL_USERNAME='${{ secrets.MAIL_USERNAME }}' \
+              -e MAIL_PASSWORD='${{ secrets.MAIL_PASSWORD }}' \
+              -e MAIL_SMTP_AUTH='${{ secrets.MAIL_SMTP_AUTH }}' \
+              -e MAIL_SMTP_STARTTLS='${{ secrets.MAIL_SMTP_STARTTLS }}' \
+              -e NOTIFY_FROM_EMAIL='${{ secrets.NOTIFY_FROM_EMAIL }}' \
               -p 8080:8080 \
               "$IMAGE_NAME"
