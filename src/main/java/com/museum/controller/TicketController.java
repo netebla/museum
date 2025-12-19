@@ -25,7 +25,7 @@ public class TicketController {
     }
 
     @PostMapping("/purchase")
-    public ResponseEntity<Ticket> purchase(@PathVariable Long eventId,
+    public ResponseEntity<Ticket> purchase(@PathVariable("eventId") Long eventId,
                                            @Valid @RequestBody TicketPurchaseRequest req,
                                            Authentication authentication) {
         User user = null;
