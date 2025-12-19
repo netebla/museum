@@ -9,4 +9,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     long countByEventId(Long eventId);
 
     List<Ticket> findByUserIdOrderByPurchaseDateDesc(Long userId);
+    
+    List<Ticket> findByBuyerEmailOrderByPurchaseDateDesc(String buyerEmail);
 }

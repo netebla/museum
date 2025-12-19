@@ -5,6 +5,7 @@ import com.museum.model.Ticket;
 import com.museum.model.User;
 import com.museum.repository.EventRepository;
 import com.museum.repository.TicketRepository;
+import com.museum.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,13 +16,16 @@ public class TicketService {
     private final TicketRepository ticketRepository;
     private final EventRepository eventRepository;
     private final NotificationService notificationService;
+    private final UserRepository userRepository;
 
     public TicketService(TicketRepository ticketRepository,
                          EventRepository eventRepository,
-                         NotificationService notificationService) {
+                         NotificationService notificationService,
+                         UserRepository userRepository) {
         this.ticketRepository = ticketRepository;
         this.eventRepository = eventRepository;
         this.notificationService = notificationService;
+        this.userRepository = userRepository;
     }
 
     @Transactional
@@ -35,6 +39,11 @@ public class TicketService {
         }
         event.setTicketsSold(sold + 1);
         eventRepository.save(event);
+
+        // Если пользователь не передан, но указан email, пытаемся найти пользователя по email
+        if (user == null && buyerEmail != null && !buyerEmail.isBlank()) {
+            user = userRepository.findByEmail(buyerEmail).orElse(null);
+        }
 
         Ticket t = new Ticket();
         t.setEvent(event);
