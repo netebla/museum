@@ -11,9 +11,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Controller
 public class ProfileController {
@@ -39,21 +40,33 @@ public class ProfileController {
         List<Ticket> ticketsByUserId = ticketRepository.findByUserIdOrderByPurchaseDateDesc(user.getId());
         
         // Также ищем билеты по email, если у пользователя есть email
+        // Сравниваем email без учета регистра
         List<Ticket> ticketsByEmail = new ArrayList<>();
         if (user.getEmail() != null && !user.getEmail().isBlank()) {
-            ticketsByEmail = ticketRepository.findByBuyerEmailOrderByPurchaseDateDesc(user.getEmail());
+            String userEmail = user.getEmail().trim().toLowerCase();
+            // Ищем билеты с точным совпадением email (без учета регистра)
+            List<Ticket> allTicketsByEmail = ticketRepository.findByBuyerEmailOrderByPurchaseDateDesc(user.getEmail());
+            // Фильтруем те, где email совпадает без учета регистра
+            ticketsByEmail = allTicketsByEmail.stream()
+                    .filter(t -> t.getBuyerEmail() != null 
+                            && t.getBuyerEmail().trim().toLowerCase().equals(userEmail))
+                    .collect(Collectors.toList());
         }
         
-        // Объединяем списки, убирая дубликаты (по id билета)
-        List<Ticket> allTickets = Stream.concat(ticketsByUserId.stream(), ticketsByEmail.stream())
-                .distinct()
-                .sorted((t1, t2) -> {
-                    if (t1.getPurchaseDate() == null && t2.getPurchaseDate() == null) return 0;
-                    if (t1.getPurchaseDate() == null) return 1;
-                    if (t2.getPurchaseDate() == null) return -1;
-                    return t2.getPurchaseDate().compareTo(t1.getPurchaseDate());
-                })
-                .collect(Collectors.toList());
+        // Объединяем списки, убирая дубликаты по id билета
+        // Используем LinkedHashMap для сохранения порядка и удаления дубликатов
+        Map<Long, Ticket> ticketsMap = new LinkedHashMap<>();
+        ticketsByUserId.forEach(t -> ticketsMap.put(t.getId(), t));
+        ticketsByEmail.forEach(t -> ticketsMap.put(t.getId(), t));
+        
+        // Сортируем по дате покупки (новые первыми)
+        List<Ticket> allTickets = new ArrayList<>(ticketsMap.values());
+        allTickets.sort((t1, t2) -> {
+            if (t1.getPurchaseDate() == null && t2.getPurchaseDate() == null) return 0;
+            if (t1.getPurchaseDate() == null) return 1;
+            if (t2.getPurchaseDate() == null) return -1;
+            return t2.getPurchaseDate().compareTo(t1.getPurchaseDate());
+        });
         
         model.addAttribute("user", user);
         model.addAttribute("tickets", allTickets);

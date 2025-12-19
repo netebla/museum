@@ -73,7 +73,16 @@ public class SecurityConfig {
                 // после успешного входа его вернёт туда, а не всегда в Swagger.
                 .defaultSuccessUrl("/swagger-ui.html")
             )
-            .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/").permitAll());
+            .logout(logout -> logout
+                .logoutRequestMatcher(
+                    org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/logout")
+                )
+                .logoutSuccessUrl("/")
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .deleteCookies("JSESSIONID")
+                .permitAll()
+            );
 
         return http.build();
     }
