@@ -51,3 +51,4 @@ app:
   notifications:
     from: ${NOTIFY_FROM_EMAIL:no-reply@kononovmuseum.ru}
   show-demo-credentials: ${SHOW_DEMO_CREDENTIALS:false}
+  public-url: ${APP_PUBLIC_URL:https://kononovmuseum.ru}

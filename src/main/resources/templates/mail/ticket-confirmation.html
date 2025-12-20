@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заявка на мероприятие принята</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
+    <!-- Wrapper table -->
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f5f5f5;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <!-- Main content card -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 600px; width: 100%;">
+                    <!-- Brand stripe -->
+                    <tr>
+                        <td style="background-color: #2c3e50; height: 4px; border-radius: 8px 8px 0 0;"></td>
+                    </tr>
+                    <!-- Header -->
+                    <tr>
+                        <td style="padding: 40px 40px 20px 40px; text-align: center;">
+                            <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #2c3e50; line-height: 1.4;">
+                                Заявка на мероприятие принята
+                            </h1>
+                        </td>
+                    </tr>
+                    <!-- Event image -->
+                    <tr th:if="${imageUrl != null and !imageUrl.isEmpty()}">
+                        <td style="padding: 0 40px 30px 40px;">
+                            <img th:src="${imageUrl}" 
+                                 th:alt="${eventTitle}" 
+                                 style="width: 100%; max-width: 520px; height: auto; border-radius: 6px; display: block; margin: 0 auto;"
+                                 alt="Изображение мероприятия" />
+                        </td>
+                    </tr>
+                    <!-- Event title -->
+                    <tr>
+                        <td style="padding: 0 40px 20px 40px;">
+                            <h2 style="margin: 0; font-size: 20px; font-weight: 600; color: #2c3e50; line-height: 1.4;">
+                                <span th:text="${eventTitle}">Название мероприятия</span>
+                            </h2>
+                        </td>
+                    </tr>
+                    <!-- Details table -->
+                    <tr>
+                        <td style="padding: 0 40px 30px 40px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f8f9fa; border-radius: 6px; padding: 20px;">
+                                <!-- Date range -->
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e9ecef;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td style="width: 120px; padding-right: 12px; vertical-align: top;">
+                                                    <span style="font-size: 14px; color: #6c757d; font-weight: 500;">Даты:</span>
+                                                </td>
+                                                <td style="vertical-align: top;">
+                                                    <span style="font-size: 14px; color: #2c3e50;" th:text="${dateRange}">01.03.2026 — 31.03.2026</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <!-- Hall (if present) -->
+                                <tr th:if="${hall != null and !hall.isEmpty()}">
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e9ecef;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td style="width: 120px; padding-right: 12px; vertical-align: top;">
+                                                    <span style="font-size: 14px; color: #6c757d; font-weight: 500;">Зал:</span>
+                                                </td>
+                                                <td style="vertical-align: top;">
+                                                    <span style="font-size: 14px; color: #2c3e50;" th:text="${hall}">Зал 1</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <!-- Status -->
+                                <tr>
+                                    <td style="padding: 8px 0; border-bottom: 1px solid #e9ecef;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td style="width: 120px; padding-right: 12px; vertical-align: top;">
+                                                    <span style="font-size: 14px; color: #6c757d; font-weight: 500;">Статус:</span>
+                                                </td>
+                                                <td style="vertical-align: top;">
+                                                    <span style="display: inline-block; background-color: #28a745; color: #ffffff; font-size: 13px; font-weight: 500; padding: 4px 12px; border-radius: 4px;"
+                                                          th:text="${statusText}">Заявка принята</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <!-- Ticket ID -->
+                                <tr>
+                                    <td style="padding: 8px 0;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td style="width: 120px; padding-right: 12px; vertical-align: top;">
+                                                    <span style="font-size: 14px; color: #6c757d; font-weight: 500;">Номер заявки:</span>
+                                                </td>
+                                                <td style="vertical-align: top;">
+                                                    <span style="font-size: 14px; color: #2c3e50; font-weight: 600;" th:text="${ticketId}">12345</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- CTA Button -->
+                    <tr>
+                        <td style="padding: 0 40px 30px 40px; text-align: center;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
+                                <tr>
+                                    <td style="background-color: #2c3e50; border-radius: 6px;">
+                                        <a th:href="${eventUrl}" 
+                                           style="display: inline-block; padding: 14px 32px; font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 6px;">
+                                            Открыть мероприятие
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 30px 40px 40px 40px; border-top: 1px solid #e9ecef; text-align: center;">
+                            <p style="margin: 0 0 8px 0; font-size: 13px; color: #6c757d; line-height: 1.5;">
+                                Спасибо за интерес к музею!
+                            </p>
+                            <p style="margin: 0; font-size: 12px; color: #adb5bd; line-height: 1.5;">
+                                <a href="https://kononovmuseum.ru" style="color: #6c757d; text-decoration: none;">kononovmuseum.ru</a>
+                                <span style="margin: 0 8px;">•</span>
+                                <span th:text="${year}">2026</span>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+
