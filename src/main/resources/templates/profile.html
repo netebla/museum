@@ -62,8 +62,11 @@
                 <span th:text="${t.event.startDate}"></span>
                 <span th:text="${t.event.endDate != null ? ' — ' + t.event.endDate : ''}"></span>
               </td>
-              <td th:text="${t.purchaseDate}">2025-01-01T10:00</td>
-              <td th:text="${t.status}">SOLD</td>
+              <td th:text="${t.purchaseDate != null ? #temporals.format(t.purchaseDate.toLocalDateTime(), 'dd.MM.yyyy, HH:mm') : '—'}">20.12.2025, 15:49</td>
+              <td>
+                <span th:if="${t.status.name() == 'SOLD'}">Продан</span>
+                <span th:if="${t.status.name() == 'FREE'}">Свободен</span>
+              </td>
             </tr>
             </tbody>
           </table>
