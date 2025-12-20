@@ -146,7 +146,8 @@ window.MuseumFront = (function () {
     meta2.className = "d-flex justify-content-between align-items-center mt-2";
     const status = document.createElement("span");
     status.className = "badge-status";
-    status.textContent = x.status || "";
+    const statusText = x.status === "PERMANENT" ? "Постоянная" : x.status === "TEMPORARY" ? "Временная" : x.status || "";
+    status.textContent = statusText;
     meta2.appendChild(status);
 
     body.appendChild(desc);

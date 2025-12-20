@@ -12,6 +12,7 @@ public class ExhibitionService {
     private final ExhibitionRepository repo;
     public ExhibitionService(ExhibitionRepository repo) { this.repo = repo; }
     public List<Exhibition> findAll() { return repo.findAll(); }
+    public List<Exhibition> findByTitle(String q) { return repo.findByTitleContainingIgnoreCase(q); }
     public Optional<Exhibition> findById(Long id) { return repo.findById(id); }
     public Exhibition save(Exhibition e) { return repo.save(e); }
     public void deleteById(Long id) { repo.deleteById(id); }

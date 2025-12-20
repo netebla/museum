@@ -310,8 +310,15 @@
 
 - **Аутентификация:**
   - форма логина `/login` (шаблон `templates/login.html`);
-  - после успешного входа — редирект на `/swagger-ui.html`;
-  - дефолтный админ создаётся при старте приложения (`DevAdminInitializer`): `admin / admin`.
+  - форма регистрации `/register` (шаблон `templates/register.html`);
+  - после успешного входа — редирект на `/swagger-ui.html` или `/profile` в зависимости от роли;
+  - дефолтный админ создаётся при старте приложения (`DevAdminInitializer`): `admin / admin`;
+  - **Сохранение паролей в браузере:**
+    - формы входа и регистрации настроены с атрибутами `autocomplete` для корректной работы менеджеров паролей браузера (Safari, Chrome, Firefox и др.);
+    - поле email/username: `autocomplete="username"`;
+    - поле пароля при входе: `autocomplete="current-password"`;
+    - поле пароля при регистрации: `autocomplete="new-password"`;
+    - поле имени: `autocomplete="name"`.
 
 ---
 

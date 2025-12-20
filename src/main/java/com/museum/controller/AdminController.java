@@ -6,10 +6,12 @@ import com.museum.model.ExhibitionStatus;
 import com.museum.service.EventService;
 import com.museum.service.ExhibitionService;
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/admin")
@@ -23,26 +25,84 @@ public class AdminController {
     }
 
     @GetMapping
-    public String index() {
+    public String index(Authentication authentication, Model model) {
+        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+        model.addAttribute("isAdmin", isAdmin);
         return "admin/index";
     }
 
     @GetMapping("/events")
-    public String events(@RequestParam(name = "q", required = false) String q, Model model) {
-        if (q != null && !q.isBlank()) {
-            model.addAttribute("events", eventService.findByTitle(q));
-        } else {
-            model.addAttribute("events", eventService.findAll());
+    public String events(@RequestParam(name = "q", required = false) String q,
+                        @RequestParam(name = "sort", required = false, defaultValue = "title") String sort,
+                        Authentication authentication,
+                        Model model) {
+        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+        model.addAttribute("isAdmin", isAdmin);
+        var events = q != null && !q.isBlank() 
+                ? eventService.findByTitle(q) 
+                : eventService.findAll();
+        
+        // Сортировка
+        events = switch (sort) {
+            case "date" -> events.stream()
+                    .sorted((a, b) -> {
+                        if (a.getStartDate() == null && b.getStartDate() == null) return 0;
+                        if (a.getStartDate() == null) return 1;
+                        if (b.getStartDate() == null) return -1;
+                        return a.getStartDate().compareTo(b.getStartDate());
+                    })
+                    .toList();
+            case "dateDesc" -> events.stream()
+                    .sorted((a, b) -> {
+                        if (a.getStartDate() == null && b.getStartDate() == null) return 0;
+                        if (a.getStartDate() == null) return 1;
+                        if (b.getStartDate() == null) return -1;
+                        return b.getStartDate().compareTo(a.getStartDate());
+                    })
+                    .toList();
+            case "hall" -> events.stream()
+                    .sorted((a, b) -> {
+                        if (a.getHall() == null && b.getHall() == null) return 0;
+                        if (a.getHall() == null) return 1;
+                        if (b.getHall() == null) return -1;
+                        return a.getHall().compareToIgnoreCase(b.getHall());
+                    })
+                    .toList();
+            default -> events.stream()
+                    .sorted((a, b) -> {
+                        if (a.getTitle() == null && b.getTitle() == null) return 0;
+                        if (a.getTitle() == null) return 1;
+                        if (b.getTitle() == null) return -1;
+                        return a.getTitle().compareToIgnoreCase(b.getTitle());
+                    })
+                    .toList();
+        };
+        
+        if (events.isEmpty() && q != null && !q.isBlank()) {
+            model.addAttribute("info", "По запросу \"" + q + "\" ничего не найдено");
         }
+        
+        model.addAttribute("events", events);
         model.addAttribute("query", q);
+        model.addAttribute("sort", sort);
         model.addAttribute("form", new EventDto());
         return "admin/events";
     }
 
     @PostMapping("/events")
-    public String createOrUpdateEvent(@Valid @ModelAttribute("form") EventDto form, BindingResult br, Model model) {
+    public String createOrUpdateEvent(@Valid @ModelAttribute("form") EventDto form, 
+                                     BindingResult br, 
+                                     Authentication authentication,
+                                     Model model) {
+        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+        model.addAttribute("isAdmin", isAdmin);
+        
         if (br.hasErrors()) {
             model.addAttribute("events", eventService.findAll());
+            model.addAttribute("error", "Проверьте правильность заполнения полей");
             return "admin/events";
         }
         com.museum.model.Event e = form.getId() != null
@@ -62,8 +122,17 @@ public class AdminController {
     }
 
     @PostMapping("/events/{id}/delete")
-    public String deleteEvent(@PathVariable("id") Long id) {
-        eventService.deleteById(id);
+    public String deleteEvent(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        if (!eventService.findById(id).isPresent()) {
+            redirectAttributes.addFlashAttribute("error", "Мероприятие не найдено");
+            return "redirect:/admin/events";
+        }
+        try {
+            eventService.deleteById(id);
+            redirectAttributes.addFlashAttribute("success", "Мероприятие успешно удалено");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Ошибка при удалении: " + e.getMessage());
+        }
         return "redirect:/admin/events";
     }
 
@@ -92,18 +161,70 @@ public class AdminController {
     }
 
     @GetMapping("/exhibitions")
-    public String exhibitions(Model model) {
-        model.addAttribute("exhibitions", exhibitionService.findAll());
+    public String exhibitions(@RequestParam(name = "q", required = false) String q,
+                             @RequestParam(name = "sort", required = false, defaultValue = "title") String sort,
+                             Authentication authentication,
+                             Model model) {
+        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+        model.addAttribute("isAdmin", isAdmin);
+        var exhibitions = q != null && !q.isBlank() 
+                ? exhibitionService.findByTitle(q) 
+                : exhibitionService.findAll();
+        
+        // Сортировка
+        exhibitions = switch (sort) {
+            case "hall" -> exhibitions.stream()
+                    .sorted((a, b) -> {
+                        if (a.getHall() == null && b.getHall() == null) return 0;
+                        if (a.getHall() == null) return 1;
+                        if (b.getHall() == null) return -1;
+                        return a.getHall().compareToIgnoreCase(b.getHall());
+                    })
+                    .toList();
+            case "status" -> exhibitions.stream()
+                    .sorted((a, b) -> {
+                        if (a.getStatus() == null && b.getStatus() == null) return 0;
+                        if (a.getStatus() == null) return 1;
+                        if (b.getStatus() == null) return -1;
+                        return a.getStatus().name().compareTo(b.getStatus().name());
+                    })
+                    .toList();
+            default -> exhibitions.stream()
+                    .sorted((a, b) -> {
+                        if (a.getTitle() == null && b.getTitle() == null) return 0;
+                        if (a.getTitle() == null) return 1;
+                        if (b.getTitle() == null) return -1;
+                        return a.getTitle().compareToIgnoreCase(b.getTitle());
+                    })
+                    .toList();
+        };
+        
+        if (exhibitions.isEmpty() && q != null && !q.isBlank()) {
+            model.addAttribute("info", "По запросу \"" + q + "\" ничего не найдено");
+        }
+        
+        model.addAttribute("exhibitions", exhibitions);
+        model.addAttribute("query", q);
+        model.addAttribute("sort", sort);
         model.addAttribute("form", new ExhibitionDto());
         model.addAttribute("statuses", ExhibitionStatus.values());
         return "admin/exhibitions";
     }
 
     @PostMapping("/exhibitions")
-    public String createOrUpdateExhibition(@Valid @ModelAttribute("form") ExhibitionDto form, BindingResult br, Model model) {
+    public String createOrUpdateExhibition(@Valid @ModelAttribute("form") ExhibitionDto form, 
+                                          BindingResult br,
+                                          Authentication authentication,
+                                          Model model) {
+        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+        model.addAttribute("isAdmin", isAdmin);
+        
         if (br.hasErrors()) {
             model.addAttribute("exhibitions", exhibitionService.findAll());
             model.addAttribute("statuses", ExhibitionStatus.values());
+            model.addAttribute("error", "Проверьте правильность заполнения полей");
             return "admin/exhibitions";
         }
         var ex = form.getId() != null
@@ -119,8 +240,17 @@ public class AdminController {
     }
 
     @PostMapping("/exhibitions/{id}/delete")
-    public String deleteExhibition(@PathVariable("id") Long id) {
-        exhibitionService.deleteById(id);
+    public String deleteExhibition(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        if (!exhibitionService.findById(id).isPresent()) {
+            redirectAttributes.addFlashAttribute("error", "Экспозиция не найдена");
+            return "redirect:/admin/exhibitions";
+        }
+        try {
+            exhibitionService.deleteById(id);
+            redirectAttributes.addFlashAttribute("success", "Экспозиция успешно удалена");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Ошибка при удалении: " + e.getMessage());
+        }
         return "redirect:/admin/exhibitions";
     }
 

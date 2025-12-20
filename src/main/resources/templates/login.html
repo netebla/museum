@@ -31,9 +31,9 @@
             <a href="/">На главную</a>
             <a href="/register">Регистрация</a>
           </div>
+          <div th:if="${@environment.getProperty('app.show-demo-credentials', 'false') == 'true'}" class="text-muted small mt-2">Демо-админ: admin / admin</div>
         </div>
       </div>
-      <div class="text-muted small mt-2">Демо-админ: admin / admin</div>
     </div>
   </div>
   </div>

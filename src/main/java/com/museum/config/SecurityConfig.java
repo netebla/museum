@@ -48,11 +48,10 @@ public class SecurityConfig {
                         "/static/**",
                         "/css/**",
                         "/js/**",
-                        "/images/**",
-                        "/swagger-ui.html",
-                        "/swagger-ui/**",
-                        "/v3/api-docs/**"
+                        "/images/**"
                 ).permitAll()
+                // Swagger доступен только для авторизованных пользователей
+                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").authenticated()
                 // Страницы логина и регистрации
                 .requestMatchers("/login", "/register").permitAll()
 
@@ -64,11 +63,18 @@ public class SecurityConfig {
 
                 // Доступ в админ-панель
                 .requestMatchers("/admin/**").hasAnyRole("ADMIN", "MANAGER")
+                
+                // Статистика доступна только для ADMIN
+                .requestMatchers("/admin/stats/**").hasRole("ADMIN")
+                
+                // Удаление через веб-интерфейс — только для ADMIN
+                .requestMatchers(HttpMethod.POST, "/admin/**/delete").hasRole("ADMIN")
 
                 // Изменения через API — только для ADMIN/MANAGER
                 .requestMatchers(HttpMethod.POST, "/api/**").hasAnyRole("ADMIN", "MANAGER")
                 .requestMatchers(HttpMethod.PUT, "/api/**").hasAnyRole("ADMIN", "MANAGER")
-                .requestMatchers(HttpMethod.DELETE, "/api/**").hasAnyRole("ADMIN", "MANAGER")
+                // Удаление через API — только для ADMIN
+                .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
 
                 // Остальное — требуется аутентификация
                 .anyRequest().authenticated()

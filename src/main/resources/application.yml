@@ -50,3 +50,4 @@ springdoc:
 app:
   notifications:
     from: ${NOTIFY_FROM_EMAIL:no-reply@kononovmuseum.ru}
+  show-demo-credentials: ${SHOW_DEMO_CREDENTIALS:false}
