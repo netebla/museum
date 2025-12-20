@@ -3,10 +3,11 @@ package com.museum.repository;
 import com.museum.model.Ticket;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
 
-public interface TicketRepository extends JpaRepository<Ticket, Long> {
+public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecificationExecutor<Ticket> {
     long countByEventId(Long eventId);
 
     @EntityGraph(attributePaths = {"event"})

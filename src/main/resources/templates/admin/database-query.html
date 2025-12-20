@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Конструктор запросов к БД</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <style>
+    .filter-section {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .table-container {
+      overflow-x: auto;
+    }
+    .table th {
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 10;
+    }
+    .sortable {
+      cursor: pointer;
+      user-select: none;
+    }
+    .sortable:hover {
+      background-color: #f0f0f0;
+    }
+    .pagination-info {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+    }
+    .error-message {
+      display: none;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/admin">Музей — Конструктор запросов</a>
+    <div class="ms-auto">
+      <a class="btn btn-outline-light btn-sm" href="/admin">Назад в админку</a>
+      <a class="btn btn-outline-light btn-sm" href="/logout">Выйти</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+  <h2 class="mb-4">Конструктор запросов к базе данных</h2>
+
+  <!-- Выбор таблицы -->
+  <div class="filter-section">
+    <h5 class="mb-3">Выбор таблицы</h5>
+    <div class="row">
+      <div class="col-md-6">
+        <select id="tableSelect" class="form-select">
+          <option value="events">Events (Мероприятия)</option>
+          <option value="exhibitions">Exhibitions (Экспозиции)</option>
+          <option value="tickets">Tickets (Билеты)</option>
+          <option value="users">Users (Пользователи)</option>
+          <option value="faq">FAQ (Вопросы-ответы)</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <button id="loadDataBtn" class="btn btn-primary">Загрузить данные</button>
+        <button id="resetFiltersBtn" class="btn btn-outline-secondary">Сбросить фильтры</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Фильтры (динамически генерируются) -->
+  <div id="filtersSection" class="filter-section" style="display: none;">
+    <h5 class="mb-3">Фильтры</h5>
+    <div id="filtersContainer" class="row"></div>
+  </div>
+
+  <!-- Настройки отображения -->
+  <div class="filter-section">
+    <h5 class="mb-3">Настройки отображения</h5>
+    <div class="row">
+      <div class="col-md-3">
+        <label class="form-label">Сортировка по:</label>
+        <select id="sortBy" class="form-select form-select-sm"></select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Направление:</label>
+        <select id="sortDir" class="form-select form-select-sm">
+          <option value="asc">По возрастанию</option>
+          <option value="desc">По убыванию</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Записей на странице:</label>
+        <select id="pageSize" class="form-select form-select-sm">
+          <option value="25">25</option>
+          <option value="50" selected>50</option>
+          <option value="100">100</option>
+          <option value="200">200</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Сообщение об ошибке -->
+  <div id="errorMessage" class="alert alert-danger error-message" role="alert"></div>
+
+  <!-- Индикатор загрузки -->
+  <div id="loading" class="loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Загрузка...</span>
+    </div>
+    <p class="mt-2">Загрузка данных...</p>
+  </div>
+
+  <!-- Таблица с данными -->
+  <div id="tableContainer" class="table-container" style="display: none;">
+    <div class="pagination-info mb-2">
+      <span id="paginationInfo"></span>
+    </div>
+    <table id="dataTable" class="table table-striped table-hover table-bordered">
+      <thead id="tableHead"></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <nav>
+      <ul id="pagination" class="pagination justify-content-center"></ul>
+    </nav>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  let currentTable = 'events';
+  let currentPage = 0;
+  let currentFilters = {};
+
+  // Определения полей для каждой таблицы
+  const tableFields = {
+    events: [
+      { name: 'id', label: 'ID', type: 'number', sortable: true },
+      { name: 'title', label: 'Название', type: 'text', sortable: true, filterable: true },
+      { name: 'description', label: 'Описание', type: 'text', sortable: false, filterable: false },
+      { name: 'startDate', label: 'Дата начала', type: 'date', sortable: true, filterable: true, filterType: 'dateRange' },
+      { name: 'endDate', label: 'Дата окончания', type: 'date', sortable: true },
+      { name: 'hall', label: 'Зал', type: 'text', sortable: true, filterable: true },
+      { name: 'ticketPrice', label: 'Цена билета', type: 'number', sortable: true, filterable: true, filterType: 'numberRange' },
+      { name: 'ticketsTotal', label: 'Всего билетов', type: 'number', sortable: true },
+      { name: 'ticketsSold', label: 'Продано билетов', type: 'number', sortable: true },
+      { name: 'imageUrl', label: 'URL изображения', type: 'text', sortable: false }
+    ],
+    exhibitions: [
+      { name: 'id', label: 'ID', type: 'number', sortable: true },
+      { name: 'title', label: 'Название', type: 'text', sortable: true, filterable: true },
+      { name: 'description', label: 'Описание', type: 'text', sortable: false },
+      { name: 'hall', label: 'Зал', type: 'text', sortable: true, filterable: true },
+      { name: 'status', label: 'Статус', type: 'select', sortable: true, filterable: true, options: ['PERMANENT', 'TEMPORARY'] },
+      { name: 'imageUrl', label: 'URL изображения', type: 'text', sortable: false }
+    ],
+    tickets: [
+      { name: 'id', label: 'ID', type: 'number', sortable: true },
+      { name: 'eventId', label: 'ID мероприятия', type: 'number', sortable: false, filterable: true },
+      { name: 'eventTitle', label: 'Название мероприятия', type: 'text', sortable: false },
+      { name: 'userId', label: 'ID пользователя', type: 'number', sortable: false },
+      { name: 'buyerName', label: 'Имя покупателя', type: 'text', sortable: true, filterable: true },
+      { name: 'buyerEmail', label: 'Email покупателя', type: 'email', sortable: true, filterable: true },
+      { name: 'status', label: 'Статус', type: 'select', sortable: true, filterable: true, options: ['FREE', 'SOLD'] },
+      { name: 'purchaseDate', label: 'Дата покупки', type: 'datetime', sortable: true, filterable: true, filterType: 'dateRange' }
+    ],
+    users: [
+      { name: 'id', label: 'ID', type: 'number', sortable: true },
+      { name: 'username', label: 'Имя пользователя', type: 'text', sortable: true, filterable: true },
+      { name: 'email', label: 'Email', type: 'email', sortable: true, filterable: true },
+      { name: 'role', label: 'Роль', type: 'select', sortable: true, filterable: true, options: ['ADMIN', 'MANAGER', 'VISITOR'] },
+      { name: 'fullName', label: 'Полное имя', type: 'text', sortable: true },
+      { name: 'passwordHash', label: 'Хеш пароля', type: 'text', sortable: false }
+    ],
+    faq: [
+      { name: 'id', label: 'ID', type: 'number', sortable: true },
+      { name: 'question', label: 'Вопрос', type: 'text', sortable: true, filterable: true },
+      { name: 'answer', label: 'Ответ', type: 'text', sortable: false },
+      { name: 'category', label: 'Категория', type: 'text', sortable: true, filterable: true }
+    ]
+  };
+
+  // Инициализация
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('tableSelect').addEventListener('change', function() {
+      currentTable = this.value;
+      currentPage = 0;
+      currentFilters = {};
+      updateFilters();
+      updateSortOptions();
+    });
+
+    document.getElementById('loadDataBtn').addEventListener('click', loadData);
+    document.getElementById('resetFiltersBtn').addEventListener('click', resetFilters);
+    document.getElementById('sortBy').addEventListener('change', loadData);
+    document.getElementById('sortDir').addEventListener('change', loadData);
+    document.getElementById('pageSize').addEventListener('change', function() {
+      currentPage = 0;
+      loadData();
+    });
+
+    updateFilters();
+    updateSortOptions();
+  });
+
+  function updateFilters() {
+    const container = document.getElementById('filtersContainer');
+    container.innerHTML = '';
+    const fields = tableFields[currentTable];
+    const filterableFields = fields.filter(f => f.filterable);
+
+    if (filterableFields.length === 0) {
+      document.getElementById('filtersSection').style.display = 'none';
+      return;
+    }
+
+    document.getElementById('filtersSection').style.display = 'block';
+
+    filterableFields.forEach(field => {
+      const col = document.createElement('div');
+      col.className = 'col-md-4 mb-3';
+
+      if (field.filterType === 'dateRange') {
+        col.innerHTML = `
+          <label class="form-label">${field.label} (от)</label>
+          <input type="date" class="form-control form-control-sm" id="filter_${field.name}From" 
+                 onchange="updateFilter('${field.name}From', this.value)">
+          <label class="form-label mt-2">${field.label} (до)</label>
+          <input type="date" class="form-control form-control-sm" id="filter_${field.name}To" 
+                 onchange="updateFilter('${field.name}To', this.value)">
+        `;
+      } else if (field.filterType === 'numberRange') {
+        col.innerHTML = `
+          <label class="form-label">${field.label} (от)</label>
+          <input type="number" step="0.01" class="form-control form-control-sm" id="filter_${field.name}Min" 
+                 onchange="updateFilter('${field.name}Min', this.value)">
+          <label class="form-label mt-2">${field.label} (до)</label>
+          <input type="number" step="0.01" class="form-control form-control-sm" id="filter_${field.name}Max" 
+                 onchange="updateFilter('${field.name}Max', this.value)">
+        `;
+      } else if (field.type === 'select') {
+        col.innerHTML = `
+          <label class="form-label">${field.label}</label>
+          <select class="form-select form-select-sm" id="filter_${field.name}" 
+                  onchange="updateFilter('${field.name}', this.value)">
+            <option value="">Все</option>
+            ${field.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+          </select>
+        `;
+      } else {
+        col.innerHTML = `
+          <label class="form-label">${field.label}</label>
+          <input type="${field.type}" class="form-control form-control-sm" id="filter_${field.name}" 
+                 onchange="updateFilter('${field.name}', this.value)">
+        `;
+      }
+
+      container.appendChild(col);
+    });
+  }
+
+  function updateSortOptions() {
+    const select = document.getElementById('sortBy');
+    select.innerHTML = '';
+    const fields = tableFields[currentTable].filter(f => f.sortable);
+    fields.forEach(field => {
+      const option = document.createElement('option');
+      option.value = field.name;
+      option.textContent = field.label;
+      if (field.name === 'id') option.selected = true;
+      select.appendChild(option);
+    });
+  }
+
+  function updateFilter(name, value) {
+    if (value) {
+      currentFilters[name] = value;
+    } else {
+      delete currentFilters[name];
+    }
+  }
+
+  function resetFilters() {
+    currentFilters = {};
+    const inputs = document.querySelectorAll('#filtersContainer input, #filtersContainer select');
+    inputs.forEach(input => {
+      if (input.type === 'text' || input.type === 'email' || input.type === 'number' || input.type === 'date') {
+        input.value = '';
+      } else if (input.tagName === 'SELECT') {
+        input.selectedIndex = 0;
+      }
+    });
+    currentPage = 0;
+    loadData();
+  }
+
+  function loadData() {
+    const table = document.getElementById('tableSelect').value;
+    const sortBy = document.getElementById('sortBy').value;
+    const sortDir = document.getElementById('sortDir').value;
+    const pageSize = parseInt(document.getElementById('pageSize').value);
+
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('tableContainer').style.display = 'none';
+    document.getElementById('errorMessage').style.display = 'none';
+
+    const params = new URLSearchParams({
+      table: table,
+      page: currentPage,
+      size: pageSize,
+      sortBy: sortBy,
+      sortDir: sortDir,
+      ...currentFilters
+    });
+
+    fetch(`/admin/database-query/data?${params}`)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('loading').style.display = 'none';
+        
+        if (data.error) {
+          document.getElementById('errorMessage').textContent = data.error;
+          document.getElementById('errorMessage').style.display = 'block';
+          return;
+        }
+
+        displayData(data);
+      })
+      .catch(error => {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('errorMessage').textContent = 'Ошибка при загрузке данных: ' + error.message;
+        document.getElementById('errorMessage').style.display = 'block';
+      });
+  }
+
+  function displayData(data) {
+    const fields = tableFields[currentTable];
+    const thead = document.getElementById('tableHead');
+    const tbody = document.getElementById('tableBody');
+
+    // Заголовки
+    thead.innerHTML = '<tr>' + fields.map(field => {
+      if (field.sortable) {
+        return `<th class="sortable" onclick="sortBy('${field.name}')">${field.label} 
+                <span id="sort_${field.name}"></span></th>`;
+      }
+      return `<th>${field.label}</th>`;
+    }).join('') + '</tr>';
+
+    // Данные
+    tbody.innerHTML = '';
+    if (data.data && data.data.length > 0) {
+      data.data.forEach(row => {
+        const tr = document.createElement('tr');
+        fields.forEach(field => {
+          const td = document.createElement('td');
+          let value = row[field.name];
+          if (value === null || value === undefined) {
+            value = '-';
+          } else if (field.type === 'text' && value && value.length > 100) {
+            value = value.substring(0, 100) + '...';
+          }
+          td.textContent = value;
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+    } else {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = fields.length;
+      td.className = 'text-center text-muted';
+      td.textContent = 'Нет данных';
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+    }
+
+    // Пагинация
+    updatePagination(data);
+    updateSortIndicators();
+
+    document.getElementById('tableContainer').style.display = 'block';
+  }
+
+  function updatePagination(data) {
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+
+    const totalPages = data.totalPages || 0;
+    const current = data.page || 0;
+    const total = data.total || 0;
+
+    document.getElementById('paginationInfo').textContent = 
+      `Показано ${current * data.size + 1}-${Math.min((current + 1) * data.size, total)} из ${total} записей`;
+
+    if (totalPages <= 1) return;
+
+    // Предыдущая
+    const prevLi = document.createElement('li');
+    prevLi.className = `page-item ${current === 0 ? 'disabled' : ''}`;
+    prevLi.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${current - 1}); return false;">Предыдущая</a>`;
+    pagination.appendChild(prevLi);
+
+    // Страницы
+    const start = Math.max(0, current - 2);
+    const end = Math.min(totalPages - 1, current + 2);
+
+    if (start > 0) {
+      const li = document.createElement('li');
+      li.className = 'page-item';
+      li.innerHTML = `<a class="page-link" href="#" onclick="goToPage(0); return false;">1</a>`;
+      pagination.appendChild(li);
+      if (start > 1) {
+        const li2 = document.createElement('li');
+        li2.className = 'page-item disabled';
+        li2.innerHTML = '<span class="page-link">...</span>';
+        pagination.appendChild(li2);
+      }
+    }
+
+    for (let i = start; i <= end; i++) {
+      const li = document.createElement('li');
+      li.className = `page-item ${i === current ? 'active' : ''}`;
+      li.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${i}); return false;">${i + 1}</a>`;
+      pagination.appendChild(li);
+    }
+
+    if (end < totalPages - 1) {
+      if (end < totalPages - 2) {
+        const li = document.createElement('li');
+        li.className = 'page-item disabled';
+        li.innerHTML = '<span class="page-link">...</span>';
+        pagination.appendChild(li);
+      }
+      const li = document.createElement('li');
+      li.className = 'page-item';
+      li.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${totalPages - 1}); return false;">${totalPages}</a>`;
+      pagination.appendChild(li);
+    }
+
+    // Следующая
+    const nextLi = document.createElement('li');
+    nextLi.className = `page-item ${current >= totalPages - 1 ? 'disabled' : ''}`;
+    nextLi.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${current + 1}); return false;">Следующая</a>`;
+    pagination.appendChild(nextLi);
+  }
+
+  function goToPage(page) {
+    currentPage = page;
+    loadData();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function sortBy(field) {
+    const sortBySelect = document.getElementById('sortBy');
+    const sortDirSelect = document.getElementById('sortDir');
+    
+    if (sortBySelect.value === field) {
+      sortDirSelect.value = sortDirSelect.value === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortBySelect.value = field;
+      sortDirSelect.value = 'asc';
+    }
+    
+    loadData();
+  }
+
+  function updateSortIndicators() {
+    const sortBy = document.getElementById('sortBy').value;
+    const sortDir = document.getElementById('sortDir').value;
+    
+    document.querySelectorAll('[id^="sort_"]').forEach(el => {
+      el.textContent = '';
+    });
+    
+    const indicator = document.getElementById(`sort_${sortBy}`);
+    if (indicator) {
+      indicator.textContent = sortDir === 'asc' ? ' ↑' : ' ↓';
+    }
+  }
+</script>
+</body>
+</html>
+
