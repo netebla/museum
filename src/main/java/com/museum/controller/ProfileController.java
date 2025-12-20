@@ -36,7 +36,7 @@ public class ProfileController {
         User user = userRepository.findByUsername(authentication.getName())
                 .orElseThrow(() -> new IllegalStateException("User not found"));
         
-        // Ищем билеты по user_id
+        // Ищем билеты по user_id (с загрузкой связанного Event через EntityGraph)
         List<Ticket> ticketsByUserId = ticketRepository.findByUserIdOrderByPurchaseDateDesc(user.getId());
         
         // Также ищем билеты по email, если у пользователя есть email
@@ -45,6 +45,7 @@ public class ProfileController {
         if (user.getEmail() != null && !user.getEmail().isBlank()) {
             String userEmail = user.getEmail().trim().toLowerCase();
             // Ищем билеты с точным совпадением email (без учета регистра)
+            // EntityGraph загрузит связанный Event, чтобы избежать LazyInitializationException
             List<Ticket> allTicketsByEmail = ticketRepository.findByBuyerEmailOrderByPurchaseDateDesc(user.getEmail());
             // Фильтруем те, где email совпадает без учета регистра
             ticketsByEmail = allTicketsByEmail.stream()

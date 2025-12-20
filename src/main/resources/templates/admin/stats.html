@@ -59,6 +59,25 @@
     </div>
   </div>
 
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <div class="text-muted small text-uppercase">Зарегистрированных пользователей</div>
+          <div class="display-6" th:text="${totalUsers}">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <div class="text-muted small text-uppercase">Заявок на билеты</div>
+          <div class="display-6" th:text="${totalTickets}">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="row g-4">
     <div class="col-lg-6">
       <h5 class="mb-3">Экспозиции по типам</h5>

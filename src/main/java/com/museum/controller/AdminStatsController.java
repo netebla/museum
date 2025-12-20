@@ -3,6 +3,8 @@ package com.museum.controller;
 import com.museum.model.Event;
 import com.museum.model.Exhibition;
 import com.museum.model.ExhibitionStatus;
+import com.museum.repository.TicketRepository;
+import com.museum.repository.UserRepository;
 import com.museum.service.EventService;
 import com.museum.service.ExhibitionService;
 import org.springframework.stereotype.Controller;
@@ -21,10 +23,15 @@ import java.util.Map;
 public class AdminStatsController {
     private final EventService eventService;
     private final ExhibitionService exhibitionService;
+    private final UserRepository userRepository;
+    private final TicketRepository ticketRepository;
 
-    public AdminStatsController(EventService eventService, ExhibitionService exhibitionService) {
+    public AdminStatsController(EventService eventService, ExhibitionService exhibitionService,
+                                UserRepository userRepository, TicketRepository ticketRepository) {
         this.eventService = eventService;
         this.exhibitionService = exhibitionService;
+        this.userRepository = userRepository;
+        this.ticketRepository = ticketRepository;
     }
 
     @GetMapping
@@ -57,12 +64,17 @@ public class AdminStatsController {
                 .limit(3)
                 .toList();
 
+        long totalUsers = userRepository.count();
+        long totalTickets = ticketRepository.count();
+
         model.addAttribute("totalEvents", totalEvents);
         model.addAttribute("upcomingEvents", upcomingEvents);
         model.addAttribute("pastEvents", pastEvents);
         model.addAttribute("totalExhibitions", totalExhibitions);
         model.addAttribute("exhibitionsByStatus", exhibitionsByStatus);
         model.addAttribute("topEvents", topByTickets);
+        model.addAttribute("totalUsers", totalUsers);
+        model.addAttribute("totalTickets", totalTickets);
 
         return "admin/stats";
     }
