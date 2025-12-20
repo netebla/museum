@@ -36,7 +36,7 @@
         <tr th:each="x : ${exhibitions}">
           <td th:text="${x.title}"></td>
           <td th:text="${x.hall}"></td>
-          <td th:text="${x.status}"></td>
+          <td th:text="${x.status.displayName}"></td>
           <td>
             <a class="btn btn-sm btn-outline-secondary me-1" th:href="@{'/admin/exhibitions/' + ${x.id} + '/edit'}">Редактировать</a>
             <form th:action="@{'/admin/exhibitions/' + ${x.id} + '/delete'}" method="post" class="d-inline">
@@ -69,7 +69,7 @@
             <div class="mb-2">
               <label class="form-label">Тип</label>
               <select class="form-select" th:field="*{status}">
-                <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"></option>
+                <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.displayName}"></option>
               </select>
             </div>
             <div class="mb-2">

@@ -354,7 +354,6 @@ window.MuseumFront = (function () {
     try {
       const data = await fetchJson("/api/faq");
       if (!data.length) {
-        root.innerHTML = '<p class="text-muted">Раздел FAQ пока пуст. Добавьте вопросы в админ‑панели.</p>';
         return;
       }
       data.forEach((f, index) => {
@@ -480,7 +479,6 @@ window.MuseumFront = (function () {
       } else if (dateValue === "past") {
         list = list.filter(isPastEvent);
       }
-      // Тип события пока заглушка — можно фильтровать по ключевым словам в названии
       if (typeValue !== "all") {
         const keywords = {
           lecture: ["лекция", "talk"],
@@ -686,7 +684,7 @@ window.MuseumFront = (function () {
               <div class="card-body small">
                 <h2 class="h6 text-uppercase text-muted mb-2">Практическая информация</h2>
                 <p class="mb-1"><strong>Место:</strong> ${hall || "Будет уточнено"}</p>
-                <p class="mb-1"><strong>Формат:</strong> лекция / показ / экскурсия (пример)</p>
+                <p class="mb-1"><strong>Формат:</strong> лекция / показ / экскурсия</p>
                 <p class="mb-0 text-muted">Точные детали формата и расписания можно добавить в описание.</p>
               </div>
             </div>

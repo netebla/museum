@@ -71,7 +71,7 @@
         </thead>
         <tbody>
         <tr th:each="entry : ${exhibitionsByStatus}">
-          <td th:text="${entry.key}">PERMANENT</td>
+          <td th:text="${entry.key.displayName}">Постоянная</td>
           <td class="text-end" th:text="${entry.value}">0</td>
         </tr>
         </tbody>

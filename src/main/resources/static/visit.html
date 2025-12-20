@@ -59,9 +59,9 @@
       <div class="col-lg-5">
         <section class="mb-4">
           <h2 class="h6 text-uppercase text-muted mb-2">Как добраться</h2>
-          <p class="small mb-1"><strong>Адрес:</strong> Город, улица, дом (пример).</p>
-          <p class="small mb-1"><strong>Метро:</strong> ближайшая станция, маршрут пешком 10–15 минут.</p>
-          <p class="small mb-1"><strong>Автобус:</strong> остановка «Музей», маршруты 1, 2, 3 (пример).</p>
+          <p class="small mb-1"><strong>Адрес:</strong> Москва, 4-й Вешняковский проезд, д. 4, к. 3</p>
+          <p class="small mb-1"><strong>Метро:</strong> Рязанский проспект</p>
+          <p class="small mb-1"><strong>Автобус:</strong> 491, е70, 429, 279</p>
           <p class="small mb-0"><strong>Авто:</strong> парковка в окрестностях, ориентируйтесь по навигатору.</p>
         </section>
 
@@ -75,8 +75,9 @@
 
         <section class="mb-4">
           <h2 class="h6 text-uppercase text-muted mb-2">Контакты</h2>
-          <p class="small mb-1">Телефон: +7 (937) 749 13-60</p>
-          <p class="small mb-1">Email: info@kononovmuseum.ru</p>
+          <p class="small mb-1"><strong>Адрес:</strong> Москва, 4-й Вешняковский проезд, д. 4, к. 3</p>
+          <p class="small mb-1"><strong>Телефон:</strong> +7 (937) 749 13-60</p>
+          <p class="small mb-1"><strong>Email:</strong> info@kononovmuseum.ru</p>
           <p class="small mb-0 text-muted">По этим контактам можно уточнить информацию о расписании, доступности и экскурсиях.</p>
         </section>
       </div>
@@ -85,11 +86,43 @@
 </main>
 
 <footer class="museum-footer border-top">
-  <div class="container d-flex flex-wrap justify-content-between align-items-center py-3">
-    <p class="mb-0 small text-muted">Музей · Информация для посетителей</p>
-    <div class="d-flex gap-2">
-      <a href="/swagger-ui.html" class="small link-secondary">API (Swagger)</a>
-      <a href="/admin" class="small link-secondary">Админ‑панель</a>
+  <div class="container py-4">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <h6 class="footer-title">МУЗЕЙ</h6>
+        <p class="small mb-2">Демо‑информационная система на Spring Boot.</p>
+        <p class="small mb-0 text-muted">
+          Используйте админ‑панель для наполнения афиши, экспозиций и FAQ.
+        </p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-title">КОНТАКТЫ</h6>
+        <p class="small mb-1">Москва, 4-й Вешняковский проезд, д. 4, к. 3</p>
+        <p class="small mb-1">Телефон: +7 (937) 749 13-60</p>
+        <p class="small mb-1">Email: info@kononovmuseum.ru</p>
+        <p class="small mb-0">Вт–Вс: 11:00–21:00, Пн — выходной</p>
+      </div>
+      <div class="col-md-4">
+        <h6 class="footer-title">ПОДПИСКА И ССЫЛКИ</h6>
+        <form class="d-flex gap-2 mb-2">
+          <input type="email" class="form-control form-control-sm" placeholder="Ваш e‑mail">
+          <button class="btn btn-dark btn-sm" type="button">Подписаться</button>
+        </form>
+        <div class="d-flex flex-wrap gap-2 small">
+          <span class="text-muted">Соцсети:</span>
+          <a href="#" class="link-secondary text-decoration-none">VK</a>
+          <a href="#" class="link-secondary text-decoration-none">Telegram</a>
+          <a href="#" class="link-secondary text-decoration-none">YouTube</a>
+        </div>
+        <div class="small mt-2">
+          <a href="/swagger-ui.html" class="link-secondary text-decoration-none">API (Swagger)</a> ·
+          <a href="/admin" class="link-secondary text-decoration-none">Админ‑панель</a>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center pt-3 mt-3 border-top small text-muted">
+      <span>© Музей 2025</span>
+      <span>Учебный проект</span>
     </div>
   </div>
 </footer>

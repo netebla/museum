@@ -8,3 +8,4 @@ WHERE t.user_id IS NULL
   AND u.email IS NOT NULL
   AND LOWER(TRIM(t.buyer_email)) = LOWER(TRIM(u.email));
 
+
