@@ -7,9 +7,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 public class SecurityConfig {
+    private final AuthenticationSuccessHandler authenticationSuccessHandler;
+
+    public SecurityConfig(CustomAuthenticationSuccessHandler authenticationSuccessHandler) {
+        this.authenticationSuccessHandler = authenticationSuccessHandler;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -69,9 +76,9 @@ public class SecurityConfig {
             // Форма логина (сессии)
             .formLogin(form -> form
                 .loginPage("/login").permitAll()
-                // Если пользователь заходил на защищённую страницу (например, /admin/exhibitions),
-                // после успешного входа его вернёт туда, а не всегда в Swagger.
-                .defaultSuccessUrl("/swagger-ui.html")
+                // Используем кастомный обработчик для перенаправления:
+                // администраторы и менеджеры идут в админку, остальные - на Swagger
+                .successHandler(authenticationSuccessHandler)
             )
             .logout(logout -> logout
                 .logoutRequestMatcher(
