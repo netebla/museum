@@ -18,11 +18,11 @@
           <form method="post" th:action="@{/login}">
             <div class="mb-3">
               <label class="form-label">E‑mail</label>
-              <input class="form-control" name="username" required>
+              <input type="email" class="form-control" name="username" autocomplete="username" required>
             </div>
             <div class="mb-3">
               <label class="form-label">Пароль</label>
-              <input type="password" class="form-control" name="password" required>
+              <input type="password" class="form-control" name="password" autocomplete="current-password" required>
             </div>
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
             <button type="submit" class="btn btn-primary w-100">Войти</button>

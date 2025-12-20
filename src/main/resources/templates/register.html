@@ -18,17 +18,17 @@
           <form th:action="@{/register}" th:object="${form}" method="post" novalidate>
             <div class="mb-3">
               <label class="form-label">E‑mail</label>
-              <input type="email" class="form-control" th:field="*{email}" required>
+              <input type="email" class="form-control" th:field="*{email}" autocomplete="username" required>
               <div class="text-danger small" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
             </div>
             <div class="mb-3">
               <label class="form-label">Имя и фамилия</label>
-              <input class="form-control" th:field="*{fullName}">
+              <input class="form-control" th:field="*{fullName}" autocomplete="name">
               <div class="form-text">Это имя будет подставляться при покупке билетов.</div>
             </div>
             <div class="mb-3">
               <label class="form-label">Пароль</label>
-              <input type="password" class="form-control" th:field="*{password}" required>
+              <input type="password" class="form-control" th:field="*{password}" autocomplete="new-password" required>
               <div class="text-danger small" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
               <div class="form-text">Не менее 6 символов.</div>
             </div>
