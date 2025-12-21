@@ -10,6 +10,7 @@ import com.museum.service.EventService;
 import com.museum.service.ExhibitionService;
 import com.museum.service.NotificationService;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +42,7 @@ public class AdminStatsController {
     }
 
     @GetMapping
+    @Transactional(readOnly = true)
     public String stats(Model model) {
         List<Event> events = eventService.findAll();
         List<Exhibition> exhibitions = exhibitionService.findAll();
@@ -78,7 +80,7 @@ public class AdminStatsController {
         int emailSendCount = notificationService.getEmailSendCount();
         
         // Среднее время ожидания до начала мероприятия (от покупки билета до начала события)
-        List<Ticket> allTickets = ticketRepository.findAll();
+        List<Ticket> allTickets = ticketRepository.findAllWithEvent();
         double avgWaitingDays = allTickets.stream()
                 .filter(t -> t.getPurchaseDate() != null && 
                             t.getEvent() != null && 
