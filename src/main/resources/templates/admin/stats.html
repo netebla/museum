@@ -60,7 +60,7 @@
   </div>
 
   <div class="row g-3 mb-4">
-    <div class="col-md-6">
+    <div class="col-md-4">
       <div class="card text-center">
         <div class="card-body">
           <div class="text-muted small text-uppercase">Зарегистрированных пользователей</div>
@@ -68,11 +68,32 @@
         </div>
       </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
       <div class="card text-center">
         <div class="card-body">
           <div class="text-muted small text-uppercase">Заявок на билеты</div>
           <div class="display-6" th:text="${totalTickets}">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <div class="text-muted small text-uppercase">Среднее время ожидания до начала мероприятия</div>
+          <div class="display-6" th:text="${avgWaitingDays} + ' дней'">0 дней</div>
+          <div class="text-muted small mt-2">от покупки билета до начала события</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <div class="text-muted small text-uppercase">Среднее время отправки email</div>
+          <div class="display-6" th:text="${avgEmailSendTime} + ' мс'">0 мс</div>
+          <div class="text-muted small mt-2" th:text="'Отправлено: ' + ${emailSendCount}">Отправлено: 0</div>
         </div>
       </div>
     </div>

@@ -18,6 +18,8 @@ import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.Year;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class NotificationService {
@@ -28,6 +30,10 @@ public class NotificationService {
     private final TemplateEngine templateEngine;
     private final String fromAddress;
     private final String publicUrl;
+    
+    // Метрики времени отправки email (в миллисекундах)
+    private final AtomicLong totalEmailSendTime = new AtomicLong(0);
+    private final AtomicInteger emailSendCount = new AtomicInteger(0);
 
     public NotificationService(JavaMailSender mailSender,
                                TemplateEngine templateEngine,
@@ -83,10 +89,37 @@ public class NotificationService {
             // helper.addInline("eventImg", imageResource);
             // В шаблоне: <img src="cid:eventImg">
 
+            // Измеряем время отправки
+            long startTime = System.currentTimeMillis();
             mailSender.send(mimeMessage);
+            long sendTime = System.currentTimeMillis() - startTime;
+            
+            // Обновляем метрики
+            totalEmailSendTime.addAndGet(sendTime);
+            emailSendCount.incrementAndGet();
+            
+            log.debug("Email sent in {} ms for ticket {}", sendTime, ticket.getId());
         } catch (MessagingException | MailException ex) {
             log.warn("Failed to send ticket confirmation e-mail for ticket {}: {}", ticket.getId(), ex.getMessage());
         }
+    }
+    
+    /**
+     * Получить среднее время отправки email в миллисекундах
+     */
+    public double getAverageEmailSendTime() {
+        int count = emailSendCount.get();
+        if (count == 0) {
+            return 0.0;
+        }
+        return (double) totalEmailSendTime.get() / count;
+    }
+    
+    /**
+     * Получить количество отправленных email
+     */
+    public int getEmailSendCount() {
+        return emailSendCount.get();
     }
 
     private TicketEmailModel buildEmailModel(Ticket ticket, Event event) {
