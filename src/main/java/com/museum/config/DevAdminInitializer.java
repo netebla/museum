@@ -26,6 +26,15 @@ public class DevAdminInitializer {
                 users.save(u);
                 log.warn("Created default admin user: username=admin, password=admin (change in production!)");
             }
+            if (users.findByUsername("manager").isEmpty()) {
+                User u = new User();
+                u.setUsername("manager");
+                u.setPasswordHash(encoder.encode("manager"));
+                u.setRole(UserRole.MANAGER);
+                u.setEmail("manager@example.com");
+                users.save(u);
+                log.warn("Created default manager user: username=manager, password=manager (change in production!)");
+            }
         };
     }
 }
